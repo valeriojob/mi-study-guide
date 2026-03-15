@@ -1,0 +1,869 @@
+/* ========================================
+   Chapter 12: Quantifying Uncertainty
+   Shared Styles
+   ======================================== */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---- Top Navigation Bar (Fixed) ---- */
+.top-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: #2d373c;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 56px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.nav-brand {
+  color: #a5d7d2;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-brand:hover {
+  color: #fff;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-links a {
+  color: #ccc;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.nav-links a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-links a.active {
+  color: #fff;
+  background: #d20537;
+}
+
+/* ---- Body & Container ---- */
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f5f7f7;
+  color: #2d373c;
+  line-height: 1.6;
+  padding: 2rem;
+  padding-top: 70px; /* space for fixed nav */
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ---- Typography ---- */
+h1 {
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  color: #2d373c;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: #2d373c;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #a5d7d2;
+}
+
+h3 {
+  font-size: 1.2rem;
+  color: #2d373c;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+h4 {
+  font-size: 1.05rem;
+  color: #2d373c;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+/* ---- Card Components ---- */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.concept-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-left: 4px solid #a5d7d2;
+}
+
+.key-concept {
+  background: #e8f5f2;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 5px solid #a5d7d2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.key-concept h3 {
+  color: #1a6b5c;
+  margin-top: 0;
+}
+
+.dark-card {
+  background: #2d373c;
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dark-card h2,
+.dark-card h3 {
+  color: #a5d7d2;
+}
+
+.dark-card h4 {
+  color: #a5d7d2;
+}
+
+.dark-card p {
+  color: #ddd;
+}
+
+.summary-card {
+  background: linear-gradient(135deg, #2d373c 0%, #3a4a52 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.summary-card h2,
+.summary-card h3 {
+  color: #a5d7d2;
+}
+
+.summary-card p,
+.summary-card li {
+  color: #e0e0e0;
+}
+
+.summary-card strong {
+  color: #fff;
+}
+
+/* ---- Formula Box ---- */
+.formula-box {
+  background: #2d373c;
+  color: #a5d7d2;
+  font-family: 'Consolas', 'Monaco', monospace;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+
+.formula-box-red {
+  background: #d20537;
+  color: white;
+  font-family: 'Consolas', 'Monaco', monospace;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(210,5,55,0.2);
+}
+
+/* ---- Analogy / Warning / Insight / Scenario Boxes ---- */
+.analogy-box {
+  background: #e8f5f2;
+  border-left: 5px solid #a5d7d2;
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.analogy-box strong {
+  color: #2d373c;
+}
+
+.warning-box {
+  background: #fce4e8;
+  border-left: 4px solid #d20537;
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.warning-box strong {
+  color: #d20537;
+}
+
+.key-insight {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1.25rem 1.5rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.key-insight strong {
+  color: #856404;
+}
+
+.scenario-box {
+  background: #2d373c;
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.scenario-box h2,
+.scenario-box h3 {
+  color: #a5d7d2;
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.scenario-box p {
+  line-height: 1.6;
+  font-size: 1rem;
+  color: #ddd;
+}
+
+/* ---- Tables ---- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+table thead {
+  background: #2d373c;
+  color: white;
+}
+
+table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+table tbody tr:hover {
+  background: #f5f7f7;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- Lists ---- */
+ul, ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Code & Pre Blocks ---- */
+code {
+  background: #f0f0f0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  color: #d20537;
+}
+
+pre {
+  background: #2d373c;
+  color: #e0e0e0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+/* ---- Example / Step Boxes ---- */
+.example-box {
+  background: #f0f9f7;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #a5d7d2;
+}
+
+.example-box h4 {
+  color: #2d373c;
+  margin-bottom: 0.5rem;
+}
+
+.example-step {
+  background: #f9fafb;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #a5d7d2;
+  border-radius: 4px;
+}
+
+.example-step strong {
+  color: #2d373c;
+}
+
+.step-box {
+  background: #e8f5f2;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #a5d7d2;
+}
+
+.step-box strong {
+  color: #2d373c;
+}
+
+/* ---- Grid Layouts ---- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* ---- Utility Classes ---- */
+.highlight {
+  color: #a5d7d2;
+  font-weight: 600;
+}
+
+.highlight-red,
+.highlight-bad {
+  color: #d20537;
+  font-weight: 600;
+}
+
+.accent-text {
+  color: #a5d7d2;
+  font-weight: 600;
+}
+
+.highlight-text {
+  color: #d20537;
+  font-weight: 600;
+}
+
+.probability {
+  color: #a5d7d2;
+  font-weight: 600;
+}
+
+.teal {
+  color: #a5d7d2;
+}
+
+/* ---- Summary Section ---- */
+.summary-section {
+  background: linear-gradient(135deg, #2d373c 0%, #1a2027 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.summary-section h2 {
+  color: #a5d7d2;
+  border-bottom: 2px solid #a5d7d2;
+}
+
+.summary-section h3 {
+  color: #a5d7d2;
+}
+
+.summary-section p {
+  color: #ddd;
+}
+
+.summary-section li {
+  color: #ddd;
+}
+
+.summary-section strong {
+  color: #fff;
+}
+
+/* ---- Details / Summary (Collapsible) ---- */
+details {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+  border: 1px solid #e0e0e0;
+}
+
+details[open] {
+  border-color: #a5d7d2;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #2d373c;
+  font-size: 0.95rem;
+  padding: 0.25rem 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary::before {
+  content: "\25B6";
+  font-size: 0.7rem;
+  color: #a5d7d2;
+  transition: transform 0.2s;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+details > *:not(summary) {
+  margin-top: 0.75rem;
+}
+
+details p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+details ul {
+  margin-top: 0.5rem;
+}
+
+details li {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* ---- Bottom Navigation ---- */
+.bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  border-top: 2px solid #e0e0e0;
+  gap: 1rem;
+}
+
+.nav-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  display: inline-block;
+}
+
+.nav-btn.prev {
+  background: #2d373c;
+  color: #fff;
+}
+
+.nav-btn.next {
+  background: #d20537;
+  color: #fff;
+}
+
+.nav-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.nav-btn.disabled {
+  visibility: hidden;
+}
+
+/* ---- Dark Card Overrides ---- */
+.dark-card .analogy-box {
+  background: #1e2a30;
+  color: #ddd;
+  border-left-color: #a5d7d2;
+}
+
+.dark-card .analogy-box strong {
+  color: #a5d7d2;
+}
+
+.dark-card .warning-box {
+  background: #3a1520;
+  color: #f0c0c8;
+}
+
+.dark-card .warning-box strong {
+  color: #ff6b8a;
+}
+
+.dark-card .key-insight {
+  background: rgba(165,215,210,0.1);
+  color: #ddd;
+  border-left-color: #a5d7d2;
+}
+
+.dark-card .key-insight strong {
+  color: #a5d7d2;
+}
+
+.dark-card .example-box {
+  background: #1e2a30;
+  border-color: #a5d7d2;
+  color: #ddd;
+}
+
+.dark-card .example-box h4 {
+  color: #a5d7d2;
+}
+
+.dark-card .example-box strong {
+  color: white;
+}
+
+.dark-card .example-step {
+  background: #1e2a30;
+  color: #ddd;
+  border-left-color: #a5d7d2;
+}
+
+.dark-card .example-step strong {
+  color: #a5d7d2;
+}
+
+.dark-card .example-section {
+  background: #1e2a30;
+  color: #ddd;
+}
+
+.dark-card .example-section strong {
+  color: #a5d7d2;
+}
+
+.dark-card table {
+  background: #1a2027;
+}
+
+.dark-card table thead {
+  background: #0d0f13;
+}
+
+.dark-card table th {
+  color: #a5d7d2;
+}
+
+.dark-card table td {
+  color: #ddd;
+  border-bottom-color: #444;
+}
+
+.dark-card table tbody tr:hover {
+  background: #364049;
+}
+
+/* ========================================
+   HOME PAGE SPECIFIC STYLES
+   ======================================== */
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #2d373c 0%, #3a4a52 100%);
+  color: #fff;
+  border-radius: 16px;
+  margin-bottom: 3rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.hero .subtitle {
+  color: #a5d7d2;
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.hero .hero-intro {
+  color: rgba(255,255,255,0.8);
+  max-width: 650px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+.btn-start {
+  display: inline-block;
+  background: #d20537;
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(210,5,55,0.4);
+}
+
+/* Lesson Grid */
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.lesson-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-left: 4px solid #a5d7d2;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.lesson-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.lesson-card .lesson-num {
+  color: #d20537;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.lesson-card h3 {
+  margin: 0.5rem 0;
+  color: #2d373c;
+  font-size: 1.1rem;
+  border: none;
+  padding: 0;
+}
+
+.lesson-card p {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.lesson-card.discussion {
+  border-left-color: #d20537;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+    padding-top: 66px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  .card, .dark-card, .concept-card, .key-concept, .summary-card {
+    padding: 1rem;
+  }
+
+  .top-nav {
+    padding: 0 0.75rem;
+  }
+
+  .nav-brand {
+    font-size: 0.9rem;
+  }
+
+  .nav-links {
+    margin-left: 0.75rem;
+  }
+
+  .nav-links a {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .bottom-nav {
+    flex-direction: column;
+  }
+
+  .nav-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-btn.disabled {
+    display: none;
+  }
+
+  .hero {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .btn-start {
+    font-size: 1rem;
+    padding: 0.85rem 2rem;
+  }
+
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  table th, table td {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .lesson-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .formula-box, .formula-box-red {
+    font-size: 0.95rem;
+    padding: 0.75rem 1rem;
+  }
+
+  pre {
+    font-size: 0.8rem;
+    padding: 1rem;
+  }
+}

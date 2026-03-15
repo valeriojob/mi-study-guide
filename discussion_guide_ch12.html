@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 12 — Open Discussion Guide</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Discussion guide page-specific styles */
+        .intro { color: #555; margin-bottom: 2rem; font-size: 0.95rem; }
+
+        /* Section label */
+        .section-label {
+            display: inline-block;
+            background: #a5d7d2;
+            color: #2d373c;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-label.part2 { background: #2d373c; color: #a5d7d2; }
+        .section-label.part3 { background: #d20537; color: white; }
+        .section-label.cross { background: #1a6b5c; color: white; }
+
+        /* Question card */
+        .q-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #a5d7d2;
+        }
+
+        .q-card.provocative { border-left-color: #d20537; }
+        .q-card.scenario { border-left-color: #2d373c; }
+        .q-card.debate { border-left-color: #ffc107; }
+
+        .q-type {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+        }
+        .q-type.conceptual { color: #a5d7d2; }
+        .q-type.provocative { color: #d20537; }
+        .q-type.scenario { color: #2d373c; }
+        .q-type.debate { color: #b8860b; }
+
+        .q-card .question {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #2d373c;
+            margin-bottom: 0.6rem;
+        }
+
+        .q-card .context {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.6rem;
+        }
+
+        .q-card .hints {
+            background: #f5f7f7;
+            border-radius: 6px;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .q-card .hints summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #2d373c;
+            font-size: 0.85rem;
+        }
+
+        .q-card .hints ul {
+            margin: 0.5rem 0 0 1.5rem;
+        }
+        .q-card .hints li {
+            margin-bottom: 0.3rem;
+        }
+
+        /* Dark discussion starter */
+        .starter-card {
+            background: #2d373c;
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .starter-card .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .starter-card .context {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .starter-card strong { color: #a5d7d2; }
+
+        /* Tips section */
+        .tips-card {
+            background: linear-gradient(135deg, #e8f5f2, #f0fbf9);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .tips-card h2 {
+            border-bottom: none;
+            margin-top: 0;
+            color: #1a6b5c;
+        }
+        .tips-card ol {
+            margin: 0.8rem 0 0 1.5rem;
+        }
+        .tips-card li {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        /* Voting box */
+        .vote-box {
+            background: white;
+            border: 2px solid #a5d7d2;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .vote-box .label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #a5d7d2;
+            margin-bottom: 0.5rem;
+        }
+        .vote-box .question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .vote-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .vote-option {
+            background: #f5f7f7;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            min-width: 120px;
+            font-size: 0.95rem;
+        }
+        .vote-option strong {
+            display: block;
+            font-size: 1.1rem;
+            color: #2d373c;
+        }
+        .vote-option span {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="lesson_1_why_uncertainty.html">1</a>
+    <a href="lesson_2_probability_basics.html">2</a>
+    <a href="lesson_3_full_joint.html">3</a>
+    <a href="lesson_4_independence.html">4</a>
+    <a href="lesson_5_bayes_rule.html">5</a>
+    <a href="lesson_6_naive_bayes.html">6</a>
+    <a href="lesson_7_wumpus_world.html">7</a>
+    <a href="discussion_guide_ch12.html" class="active">💬</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<h1>Chapter 12: Open Discussion Guide</h1>
+<p class="subtitle">Quantifying Uncertainty — Russell & Norvig, 4th Edition</p>
+<p class="intro">Use this guide to lead a 10-15 minute class discussion after the three presentations. Questions are organized by section, from warm-up to deeper provocations. Each card includes hints you can reveal if the discussion stalls.</p>
+
+<!-- ============================================ -->
+<!-- WARM-UP: Quick Poll -->
+<!-- ============================================ -->
+<h2>Warm-Up: Quick Audience Poll</h2>
+
+<div class="vote-box">
+    <div class="label">Show of hands / quick poll</div>
+    <p class="question">A patient has a toothache. Without any other information, how confident are you it's a cavity?</p>
+    <div class="vote-options">
+        <div class="vote-option"><strong>< 30%</strong><span>Probably not</span></div>
+        <div class="vote-option"><strong>30-60%</strong><span>Maybe</span></div>
+        <div class="vote-option"><strong>60-90%</strong><span>Likely</span></div>
+        <div class="vote-option"><strong>> 90%</strong><span>Almost certain</span></div>
+    </div>
+</div>
+
+<p style="color: #666; font-size: 0.9rem; margin-bottom: 2rem;">After collecting answers, reveal: "The textbook calculates it at about 60% from the full joint table — and only 47% if we use Bayes' Rule with different priors. Your gut feeling IS a form of probabilistic reasoning!"</p>
+
+<!-- ============================================ -->
+<!-- PART 1: Why Uncertainty? -->
+<!-- ============================================ -->
+<h2>Part 1: Why Uncertainty?</h2>
+<span class="section-label">Manuel's Section</span>
+
+<div class="q-card">
+    <div class="q-type conceptual">Conceptual</div>
+    <p class="question">Can you think of a real-world AI system where pure logic (true/false) would actually be enough — no probability needed?</p>
+    <p class="context">This challenges the claim that uncertainty is always necessary. Are there domains where the world is fully observable and deterministic?</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Chess before the opponent moves — fully observable, deterministic rules</li>
+            <li>Mathematical theorem proving — pure logic works perfectly</li>
+            <li>But even chess requires probability when modeling the opponent's strategy</li>
+            <li>Key insight: the moment you add an adversary or hidden information, you need uncertainty</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card provocative">
+    <div class="q-type provocative">Provocative</div>
+    <p class="question">The textbook says "every logical rule needs an almost infinite list of exceptions" (the qualification problem). Is this really true, or is it just a limitation of how we write rules?</p>
+    <p class="context">Could a sufficiently powerful logical system avoid the qualification problem, or is uncertainty truly fundamental?</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Non-monotonic logics (default reasoning) try to handle exceptions — but they still struggle with quantifying "how likely"</li>
+            <li>The real issue isn't listing exceptions — it's that we need to compare degrees of confidence</li>
+            <li>"Toothache → probably cavity" needs a number, not just a rule</li>
+            <li>Probability gives us a calculus for uncertain reasoning that logic simply can't match</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card scenario">
+    <div class="q-type scenario">Real-world scenario</div>
+    <p class="question">Self-driving cars face partial observability, nondeterminism, and adversaries (other drivers). How do you think they handle uncertainty in practice?</p>
+    <p class="context">Connect the abstract concepts from Part 1 to a concrete modern AI system.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Sensor fusion (combining cameras, LIDAR, radar) — reduces but doesn't eliminate partial observability</li>
+            <li>Probabilistic prediction of other drivers' intentions</li>
+            <li>Decision theory: balancing "might hit something" vs "stopping unnecessarily blocks traffic"</li>
+            <li>Expected utility: a 1% chance of hitting a pedestrian has enormous negative utility</li>
+        </ul>
+    </details>
+</div>
+
+<!-- ============================================ -->
+<!-- PART 2: The Language of Probability -->
+<!-- ============================================ -->
+<h2>Part 2: The Language of Probability</h2>
+<span class="section-label part2">Jonathan's Section</span>
+
+<div class="q-card">
+    <div class="q-type conceptual">Conceptual</div>
+    <p class="question">What's the difference between "it will rain with 70% probability" from a weather forecast and "this coin has 50% probability of heads"? Are these the same kind of probability?</p>
+    <p class="context">This touches on the frequentist vs. Bayesian interpretation debate.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Frequentist: probability = long-run frequency (coin flips, many trials)</li>
+            <li>Bayesian: probability = degree of belief (weather tomorrow is a one-time event)</li>
+            <li>The textbook uses the Bayesian interpretation — probabilities represent an agent's beliefs</li>
+            <li>Key point: even "subjective" beliefs must obey the axioms of probability to be rational</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card provocative">
+    <div class="q-type provocative">Provocative</div>
+    <p class="question">Bayes' Rule lets us flip P(symptom|disease) into P(disease|symptom). But where do we get P(symptom|disease) in the first place? Isn't that just as hard?</p>
+    <p class="context">This question probes where probabilistic knowledge actually comes from.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Causal probabilities come from controlled studies, medical trials, domain expertise</li>
+            <li>They're more stable than diagnostic probabilities (the meningitis example!)</li>
+            <li>In practice: machine learning estimates these from data</li>
+            <li>The beauty of Bayes' Rule is that causal knowledge is reusable across different contexts</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card debate">
+    <div class="q-type debate">Debate</div>
+    <p class="question">Should an AI medical diagnosis system report exact probabilities to patients ("you have a 23.7% chance of cancer") or use qualitative labels ("low risk")?</p>
+    <p class="context">Probability is mathematically precise, but humans don't always process numbers well.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Exact numbers can cause anxiety (23.7% sounds scarier than "low risk")</li>
+            <li>But qualitative labels hide important distinctions (is 15% and 25% both "low risk"?)</li>
+            <li>Doctors already struggle with communicating probabilities — AI could make it worse or better</li>
+            <li>Related: the base rate fallacy — people misunderstand conditional probabilities</li>
+        </ul>
+    </details>
+</div>
+
+<!-- ============================================ -->
+<!-- PART 3: Independence & Naïve Bayes -->
+<!-- ============================================ -->
+<h2>Part 3: Independence & Naïve Bayes</h2>
+<span class="section-label part3">Valerio's Section</span>
+
+<div class="starter-card">
+    <p class="question">We showed that a toothache alone gives 47% confidence in a cavity, but adding the probe catch jumps it to 94%. Can you think of a situation in everyday life where a second piece of evidence dramatically changes your confidence?</p>
+    <p class="context">Think about situations where one clue is ambiguous but two clues together are very convincing. Maybe from crime investigations, medical diagnosis, or even just deciding whether a restaurant is good.</p>
+</div>
+
+<div class="q-card provocative">
+    <div class="q-type provocative">Provocative</div>
+    <p class="question">Naïve Bayes assumes symptoms are independent given the disease. But toothache and catch-on-probe are clearly both caused by tooth decay — aren't they correlated even given the cavity? Why does Naïve Bayes still work?</p>
+    <p class="context">This is the central paradox of Naïve Bayes and the most important question from Section 3.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Yes, the independence assumption IS violated — that's why it's called "naïve"</li>
+            <li>But we don't need correct probabilities — we need correct rankings</li>
+            <li>Think of a race: if your stopwatch runs 10% fast, you still pick the faster runner</li>
+            <li>The violations affect all hypotheses similarly, so the ranking is preserved</li>
+            <li>Naïve Bayes produces overconfident probabilities (too close to 0 or 1) but the winner is usually right</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card scenario">
+    <div class="q-type scenario">Real-world scenario</div>
+    <p class="question">Your email spam filter uses Naïve Bayes. One day it starts flagging all emails from your bank as spam. Using what you learned, what probably went wrong and how would you fix it?</p>
+    <p class="context">Apply the concepts of priors, conditional probabilities, and independence to debug a real system.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Possible cause: the word "account" or "verify" has high P(word|spam) from phishing emails</li>
+            <li>The bank emails contain many of these "spam-like" words, and Naïve Bayes multiplies them all</li>
+            <li>Fix 1: whitelist the sender (bypass the classifier)</li>
+            <li>Fix 2: add more features (sender reputation, links, headers) — more evidence helps</li>
+            <li>Fix 3: retrain with bank emails labeled as "not spam" to update the conditional probabilities</li>
+            <li>This shows the limitation of the independence assumption: "account" and "verify" appearing together in bank emails are correlated, not independent</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card">
+    <div class="q-type conceptual">Conceptual</div>
+    <p class="question">We saw that the full joint distribution grows as 2^n. Conditional independence reduces this to O(n). What happens when conditional independence doesn't hold — is there anything between "exponential" and "linear"?</p>
+    <p class="context">This bridges to Chapter 13 (Bayesian Networks).</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Bayesian Networks (Ch. 13) are exactly this middle ground</li>
+            <li>They encode which variables depend on which — a graph of dependencies</li>
+            <li>If the graph is sparse (few connections), inference is tractable</li>
+            <li>If every variable depends on every other, we're back to exponential</li>
+            <li>Real-world domains tend to have sparse dependencies — that's why BNs work</li>
+        </ul>
+    </details>
+</div>
+
+<!-- ============================================ -->
+<!-- CROSS-CUTTING: Bigger Picture -->
+<!-- ============================================ -->
+<h2>Bigger Picture: Cross-Cutting Questions</h2>
+<span class="section-label cross">All Sections</span>
+
+<div class="starter-card">
+    <p class="question">Chapter 12 argues that <strong>probability is the right way</strong> to handle uncertainty. But are there alternatives? What about fuzzy logic, or just using neural networks that learn everything end-to-end?</p>
+    <p class="context">This question challenges the fundamental premise of the chapter and connects to modern deep learning.</p>
+</div>
+
+<div class="q-card debate">
+    <div class="q-type debate">Debate</div>
+    <p class="question">Modern large language models (like GPT, Claude) don't explicitly use Bayes' Rule or joint probability tables. Does that mean Chapter 12 is outdated, or are these ideas still relevant?</p>
+    <p class="context">A great question to end the discussion — connects classic AI to modern AI.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>LLMs implicitly learn probability distributions over language — they ARE probabilistic models</li>
+            <li>The softmax output layer is literally a probability distribution</li>
+            <li>Bayes' Rule is still used in retrieval-augmented generation, calibration, and uncertainty estimation</li>
+            <li>Chapter 12's ideas are the foundation — modern systems build on them, not replace them</li>
+            <li>Understanding WHY things work matters even when tools become more powerful</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card provocative">
+    <div class="q-type provocative">Provocative</div>
+    <p class="question">The textbook's decision theory says: "maximize expected utility." But humans don't do this — we're risk-averse, we have biases, we panic. Should AI systems be rational (maximize EU) or should they mimic human decision-making?</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>Prospect theory (Kahneman & Tversky): humans overweight small probabilities and are loss-averse</li>
+            <li>A self-driving car that maximizes EU might make decisions that feel "wrong" to passengers</li>
+            <li>Medical AI: should it recommend the statistically optimal treatment even if the patient is risk-averse?</li>
+            <li>Utility function design is subjective — whose utility are we maximizing?</li>
+            <li>Maybe the answer is: be rational in calculation, but incorporate human preferences in the utility function</li>
+        </ul>
+    </details>
+</div>
+
+<div class="q-card scenario">
+    <div class="q-type scenario">Real-world scenario</div>
+    <p class="question">Imagine you're building a COVID test result interpreter. You know: P(positive test | COVID) = 95% and P(positive test | no COVID) = 3%. The base rate in Switzerland is 1 in 1000. A person tests positive. What's P(COVID | positive test)?</p>
+    <p class="context">Apply Bayes' Rule live with the audience. This demonstrates the base rate fallacy — the answer is surprisingly low.</p>
+    <details class="hints">
+        <summary>Discussion hints</summary>
+        <ul>
+            <li>P(COVID) = 0.001, P(positive|COVID) = 0.95, P(positive|no COVID) = 0.03</li>
+            <li>Numerator: 0.95 × 0.001 = 0.00095</li>
+            <li>Denominator: 0.00095 + 0.03 × 0.999 = 0.00095 + 0.02997 = 0.03092</li>
+            <li>P(COVID|positive) = 0.00095 / 0.03092 ≈ 3.1%</li>
+            <li>Even with a 95% accurate test, a positive result means only ~3% chance of COVID!</li>
+            <li>This is the base rate fallacy — people ignore how rare the disease is</li>
+            <li>This is exactly why we need Bayes' Rule: our intuition fails here</li>
+        </ul>
+    </details>
+</div>
+
+<!-- ============================================ -->
+<!-- TIPS FOR MODERATING -->
+<!-- ============================================ -->
+<div class="tips-card">
+    <h2>Tips for Leading the Discussion</h2>
+    <ol>
+        <li><strong>Start with the poll</strong> — it gets everyone engaged immediately and sets up the "your intuition IS probability" framing.</li>
+        <li><strong>Use the COVID example</strong> as a live calculation — have someone volunteer to do the math on the board. The surprise of the answer (3%!) always sparks debate.</li>
+        <li><strong>Don't rush to hints</strong> — let silence sit for 5-10 seconds before opening the hints. Someone will speak up.</li>
+        <li><strong>Connect answers back to the dentist example</strong> — it's the common thread across all three sections.</li>
+        <li><strong>End with the LLM question</strong> — it's the most forward-looking and gives everyone a chance to share opinions even without deep technical knowledge.</li>
+        <li><strong>Keep it to 3-4 questions max</strong> in a 10-minute window. Better to go deep on fewer questions than rush through many.</li>
+    </ol>
+</div>
+
+<div class="bottom-nav">
+  <a href="lesson_7_wumpus_world.html" class="nav-btn prev">&larr; The Wumpus World</a>
+  <span class="nav-btn disabled"></span>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12.1 — Why Uncertainty?</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .scenario { background: #2d373c; color: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .scenario h2 { color: #a5d7d2; font-size: 1.3rem; margin-bottom: 0.8rem; }
+  .scenario p { line-height: 1.6; font-size: 1rem; }
+
+  .reasons { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .reason { flex: 1; min-width: 250px; background: white; border-radius: 12px; padding: 1.5rem; border-top: 4px solid; }
+  .reason:nth-child(1) { border-color: #d20537; }
+  .reason:nth-child(2) { border-color: #a5d7d2; }
+  .reason:nth-child(3) { border-color: #2d373c; }
+  .reason .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .reason h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .reason p { color: #555; font-size: 0.95rem; line-height: 1.5; }
+  .reason .example { background: #f5f7f7; border-radius: 8px; padding: 0.7rem; margin-top: 0.7rem; font-size: 0.9rem; color: #444; }
+  .reason .example strong { color: #d20537; }
+
+  .logic-problem { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .logic-problem h2 { font-size: 1.3rem; margin-bottom: 1rem; color: #d20537; }
+
+  .comparison { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+  .approach { flex: 1; min-width: 280px; border-radius: 10px; padding: 1.2rem; }
+  .approach.logic { background: #fce4e8; border: 2px solid #d20537; }
+  .approach.probability { background: #e8f5f2; border: 2px solid #a5d7d2; }
+  .approach h3 { margin-bottom: 0.5rem; font-size: 1.05rem; }
+  .approach .verdict { font-weight: bold; margin-top: 0.8rem; padding-top: 0.5rem; border-top: 1px solid rgba(0,0,0,0.1); }
+  .approach.logic .verdict { color: #d20537; }
+  .approach.probability .verdict { color: #1a6b5c; }
+
+  .decision-theory { background: linear-gradient(135deg, #2d373c, #3d4d54); color: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+  .decision-theory h2 { color: #a5d7d2; margin-bottom: 1rem; }
+  .formula { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 1rem; text-align: center; font-size: 1.2rem; margin: 1rem 0; font-family: 'Consolas', monospace; }
+  .formula span { color: #a5d7d2; }
+
+  .key-terms { background: white; border-radius: 12px; padding: 1.5rem; }
+  .key-terms h2 { margin-bottom: 1rem; }
+  .term { display: flex; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid #eee; }
+  .term:last-child { border-bottom: none; }
+  .term-name { font-weight: bold; min-width: 180px; color: #2d373c; }
+  .term-def { color: #555; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="lesson_1_why_uncertainty.html" class="active">1</a>
+    <a href="lesson_2_probability_basics.html">2</a>
+    <a href="lesson_3_full_joint.html">3</a>
+    <a href="lesson_4_independence.html">4</a>
+    <a href="lesson_5_bayes_rule.html">5</a>
+    <a href="lesson_6_naive_bayes.html">6</a>
+    <a href="lesson_7_wumpus_world.html">7</a>
+    <a href="discussion_guide_ch12.html">💬</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<h1>Chapter 12.1 — Why Do We Need Uncertainty?</h1>
+<p class="subtitle">The world is messy. Pure logic isn't enough.</p>
+
+<div class="scenario">
+  <h2>The Scenario: You're building an AI dentist assistant</h2>
+  <p>Your AI needs to decide: does this patient have a cavity? It has some information — the patient has a toothache, and the probe catches on the tooth. But it can <em>never</em> be 100% sure. Why?</p>
+</div>
+
+<div class="reasons">
+  <div class="reason">
+    <div class="icon">&#128065;&#65039;</div>
+    <h3>Partial Observability</h3>
+    <p>The agent can't see everything. There's hidden information it simply doesn't have access to.</p>
+    <div class="example"><strong>Dentist:</strong> You can't see inside the tooth without drilling. X-rays help but aren't perfect.</div>
+  </div>
+
+  <div class="reason">
+    <div class="icon">&#127922;</div>
+    <h3>Nondeterminism</h3>
+    <p>The same action can lead to different outcomes. The world has randomness built in.</p>
+    <div class="example"><strong>Dentist:</strong> The same filling procedure might work perfectly one time and fail another — depends on factors we can't fully control.</div>
+  </div>
+
+  <div class="reason">
+    <div class="icon">&#127744;</div>
+    <h3>Sheer Complexity</h3>
+    <p>Even if we could observe everything, there are too many factors to track. We're too "lazy" (in a good way) to model it all.</p>
+    <div class="example"><strong>Dentist:</strong> Patient's diet, genetics, brushing habits, stress levels, hundreds of other factors all affect cavity risk.</div>
+  </div>
+</div>
+
+<div class="logic-problem">
+  <h2>Why can't we just use logic?</h2>
+  <p style="margin-bottom: 1rem; line-height: 1.6;">In earlier chapters, AI used <strong>logical rules</strong> like: "If toothache, then cavity." But this has a big problem...</p>
+
+  <div class="comparison">
+    <div class="approach logic">
+      <h3>Pure Logic Approach</h3>
+      <p style="font-size: 0.95rem; line-height: 1.5;">"Toothache → Cavity"</p>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">But not all toothaches are cavities! Could be gum disease, a cracked tooth, or even a sinus infection.</p>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">We'd need to list every single exception: "Toothache ∧ ¬GumDisease ∧ ¬Crack ∧ ¬Sinus ∧ ... → Cavity"</p>
+      <p class="verdict">This is called the <em>qualification problem</em> — the list of exceptions never ends.</p>
+    </div>
+
+    <div class="approach probability">
+      <h3>Probability Approach</h3>
+      <p style="font-size: 0.95rem; line-height: 1.5;">"P(cavity | toothache) = 0.6"</p>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">Given a toothache, there's a 60% chance of cavity. Simple, practical, and accounts for all the exceptions implicitly.</p>
+      <p style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">We don't need to list every possible cause — the probability already captures the overall picture.</p>
+      <p class="verdict">Probability lets us be precise about our uncertainty.</p>
+    </div>
+  </div>
+</div>
+
+<div class="decision-theory">
+  <h2>How does the agent actually decide?</h2>
+  <p style="line-height: 1.6; margin-bottom: 1rem;">The agent combines two things:</p>
+  <div class="formula">
+    <span>Best action</span> = what's most likely to happen + how much I care about each outcome
+  </div>
+  <p style="line-height: 1.6;">This is called <strong>decision theory</strong>. It says: a rational agent picks the action that maximizes <strong>expected utility</strong> — the average "goodness" of the outcome, weighted by how likely each outcome is.</p>
+  <div class="formula">
+    Decision Theory = <span>Probability</span> (what might happen) + <span>Utility</span> (how much I care)
+  </div>
+  <p style="font-size: 0.9rem; color: #ccc; margin-top: 0.8rem;"><strong>Dentist example:</strong> Should we drill? Depends on (a) how likely it's a cavity, and (b) how bad it is to drill unnecessarily vs. leaving a cavity untreated.</p>
+</div>
+
+<div class="key-terms">
+  <h2>Key Concepts from Section 12.1</h2>
+  <div class="term">
+    <div class="term-name">Uncertainty</div>
+    <div class="term-def">The agent doesn't know the full state of the world. This is unavoidable in real-world problems.</div>
+  </div>
+  <div class="term">
+    <div class="term-name">Qualification Problem</div>
+    <div class="term-def">The impossibility of listing every exception to a logical rule. There are always more edge cases.</div>
+  </div>
+  <div class="term">
+    <div class="term-name">Degree of Belief</div>
+    <div class="term-def">A number between 0 and 1 that represents how confident the agent is. 0 = impossible, 1 = certain.</div>
+  </div>
+  <div class="term">
+    <div class="term-name">Decision Theory</div>
+    <div class="term-def">Probability (beliefs) + Utility (preferences) = rational decisions. Pick the action with the highest expected utility.</div>
+  </div>
+  <div class="term">
+    <div class="term-name">Expected Utility</div>
+    <div class="term-def">The average outcome of an action, weighted by how likely each outcome is. The rational agent maximizes this.</div>
+  </div>
+</div>
+
+<div class="summary-section card" style="margin-top:2rem;">
+  <h2 style="color:#a5d7d2; border:none; margin-top:0; padding-top:0;">Summary</h2>
+  <ul style="padding-left:1.5rem;">
+    <li><strong style="color:#a5d7d2;">Uncertainty is unavoidable</strong> — partial observability, nondeterminism, and complexity guarantee it.</li>
+    <li><strong style="color:#a5d7d2;">Pure logic fails</strong> — the qualification problem means you can never list all exceptions.</li>
+    <li><strong style="color:#a5d7d2;">Probability captures uncertainty</strong> — degrees of belief between 0 and 1 let agents reason precisely.</li>
+    <li><strong style="color:#a5d7d2;">Decision theory</strong> combines probability with utility to pick the best action.</li>
+    <li><strong style="color:#a5d7d2;">Expected utility</strong> is the core criterion for rational decision-making.</li>
+  </ul>
+</div>
+
+<div class="bottom-nav">
+  <a href="index.html" class="nav-btn prev">&larr; Home</a>
+  <a href="lesson_2_probability_basics.html" class="nav-btn next">Next: Probability Basics &rarr;</a>
+</div>
+
+</div>
+
+</body>
+</html>

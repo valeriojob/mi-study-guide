@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 12.6: Naive Bayes Models</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .example-section {
+            background-color: #f0f8f7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .example-section strong {
+            color: #2d373c;
+        }
+
+        .try-it {
+            background-color: white;
+            border: 2px solid #a5d7d2;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .try-it h3 {
+            color: #a5d7d2;
+        }
+
+        .sentence-example {
+            background-color: #2d373c;
+            color: #a5d7d2;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-style: italic;
+            font-family: 'Consolas', monospace;
+        }
+
+        .summary-list {
+            background-color: white;
+            border-left: 4px solid #a5d7d2;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            color: #2d373c;
+        }
+
+        .complexity-comparison {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .complexity-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .complexity-row:last-child {
+            border-bottom: none;
+        }
+
+        .complexity-label {
+            font-weight: 600;
+            color: #2d373c;
+        }
+
+        .complexity-value {
+            color: #a5d7d2;
+            font-weight: 600;
+        }
+
+        .complexity-value-red {
+            color: #d20537;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+      <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="lesson_1_why_uncertainty.html">1</a>
+        <a href="lesson_2_probability_basics.html">2</a>
+        <a href="lesson_3_full_joint.html">3</a>
+        <a href="lesson_4_independence.html">4</a>
+        <a href="lesson_5_bayes_rule.html">5</a>
+        <a href="lesson_6_naive_bayes.html" class="active">6</a>
+        <a href="lesson_7_wumpus_world.html">7</a>
+        <a href="discussion_guide_ch12.html">💬</a>
+      </div>
+    </nav>
+
+    <div class="container">
+    <h1>Chapter 12.6: Naive Bayes Models</h1>
+    <p class="subtitle">Understanding the most practical probabilistic classifier</p>
+
+    <!-- Introduction Card -->
+    <div class="card">
+        <h2>What Are Naive Bayes Models?</h2>
+        <p>Naive Bayes is a <span class="highlight">probabilistic classifier</span> that solves a massive computational problem: how to compute P(Cause|Effects) when you have many effects.</p>
+
+        <p>The key insight: assume all effects are <span class="highlight">conditionally independent</span> given the cause. This is rarely true in reality, but the assumption lets you compute probabilities efficiently.</p>
+
+        <div class="analogy-box">
+            <strong>Real-world intuition:</strong> When you walk into a room and see wet pavement, wet grass, and clouds overhead, you infer it rained. You're not computing complex correlations between these effects—you're treating each sign independently. That's Naive Bayes thinking.
+        </div>
+    </div>
+
+    <!-- Section 1: The Pattern -->
+    <div class="card">
+        <h2>Section 1: The Pattern — One Cause, Many Effects</h2>
+
+        <p>Naive Bayes models have a simple structure:</p>
+        <ul>
+            <li><strong>One cause variable:</strong> Usually categorical (e.g., Category, Disease, Rainfall)</li>
+            <li><strong>Many effect variables:</strong> What we observe (e.g., words, symptoms, observations)</li>
+            <li><strong>Conditional independence:</strong> All effects depend only on the cause, not on each other</li>
+        </ul>
+
+        <h3>The Dental Example</h3>
+        <p>Imagine a dentist diagnosing a <span class="highlight">cavity</span> (the cause). A cavity causes various observable effects:</p>
+
+        <div class="example-section">
+            <strong>Cavity (cause) →</strong>
+            <ul style="margin-left: 2rem; margin-top: 0.5rem;">
+                <li>Toothache (effect 1)</li>
+                <li>Catch on probe (effect 2)</li>
+                <li>X-ray discoloration (effect 3)</li>
+                <li>Pain when chewing (effect 4)</li>
+                <li>...and other observations</li>
+            </ul>
+        </div>
+
+        <p>The full joint probability for <em>n</em> effects is:</p>
+        <div class="formula-box">
+            P(Cause, Effect₁, Effect₂, ..., Effectₙ)
+            = P(Cause) · P(Effect₁|Cause) · P(Effect₂|Cause) · ... · P(Effectₙ|Cause)
+        </div>
+
+        <h3>Why This Matters: The Complexity Reduction</h3>
+        <p>Without the independence assumption, you'd need to store probabilities for every possible combination of cause and effects:</p>
+
+        <div class="complexity-comparison">
+            <div class="complexity-row">
+                <span class="complexity-label">Without independence assumption:</span>
+                <span class="complexity-value-red">O(2ⁿ)</span>
+            </div>
+            <div class="complexity-row">
+                <span class="complexity-label">With Naive Bayes assumption:</span>
+                <span class="complexity-value">O(n)</span>
+            </div>
+        </div>
+
+        <p>For 10 binary effects, that's the difference between 1,024 probabilities and just 20. For 100 effects? <span class="highlight-red">2¹⁰⁰</span> versus 200 probabilities. <span class="highlight">Huge simplification.</span></p>
+
+        <div class="key-insight">
+            <strong>Key Insight:</strong> The independence assumption lets us decompose an exponentially large joint probability into a simple product of smaller probabilities.
+        </div>
+    </div>
+
+    <!-- Section 2: Why "Naive"? -->
+    <div class="dark-card">
+        <h2>Section 2: Why Is It Called "Naive"?</h2>
+
+        <p>The word "naive" refers to the <span class="highlight">independence assumption</span>. In reality, effects are often correlated!</p>
+
+        <h3>The Assumption Breaks Down</h3>
+        <p>Consider our dental example: if you have a cavity, you're more likely to have both a toothache AND a catch on the probe. But these two effects might also be somewhat correlated for other reasons—they're not truly independent.</p>
+
+        <div class="warning-box">
+            <strong>The paradox:</strong> The independence assumption is almost always violated in practice. Yet Naive Bayes still works remarkably well for classification!
+        </div>
+
+        <h3>So Why Does It Work?</h3>
+        <p>The answer is subtle: we don't care about <span class="highlight">calibrated probabilities</span>. We only care about <span class="highlight">ranking</span>.</p>
+
+        <p>When you classify a new article or email, you pick the category with the highest score. As long as the ranking is correct (i.e., the true category has the highest score), mismatched probabilities don't matter.</p>
+
+        <div class="example-section">
+            <strong>Example:</strong> Suppose Naive Bayes computes:<br>
+            P(Business | text) = 0.98<br>
+            P(Sports | text) = 0.01<br>
+            <br>
+            The true probabilities might actually be:<br>
+            P(Business | text) = 0.92<br>
+            P(Sports | text) = 0.07<br>
+            <br>
+            The ranking is the same (Business > Sports), so classification is correct even though our probabilities were miscalibrated.
+        </div>
+
+        <h3>Independence Violations Don't Break Ranking</h3>
+        <p>The assumption violations tend to make the model <span class="highlight">overconfident</span> (probabilities too close to 0 or 1), but they rarely flip the ranking of hypotheses. That's why Naive Bayes is called "naive"—it makes unrealistic assumptions—yet remains one of the most practical classifiers.</p>
+    </div>
+
+    <!-- Section 3: Text Classification -->
+    <div class="card">
+        <h2>Section 3: Text Classification Example</h2>
+
+        <p>Let's walk through a complete example: classifying newspaper articles into categories.</p>
+
+        <h3>The Setup</h3>
+        <div class="step-box">
+            <strong>Cause (hidden):</strong> Article category (Business, Sports, Weather, Science)<br>
+            <strong>Effects (observed):</strong> Presence or absence of keywords (stocks, rally, quarterback, rainfall, etc.)
+        </div>
+
+        <h3>Learning the Model from Data</h3>
+        <p>Given a training set of labeled articles, we compute:</p>
+
+        <div class="formula-box">
+            P(Category = c) = (# articles in category c) / (total articles)
+        </div>
+
+        <p>This is just the <span class="highlight">prior probability</span> of each category.</p>
+
+        <div class="formula-box">
+            P(HasWord_i | Category = c) = (# articles in c containing word i) / (# articles in c)
+        </div>
+
+        <p>This is the <span class="highlight">likelihood</span>: how often word <em>i</em> appears in articles of category <em>c</em>.</p>
+
+        <h3>Classification Step</h3>
+        <p>For a new article with words w₁, w₂, ..., wₘ, we compute:</p>
+
+        <div class="formula-box-red">
+            Score(c) = P(Category = c) · ∏ P(wᵢ | Category = c)
+        </div>
+
+        <p>Then pick the category with the highest score:</p>
+        <div class="formula-box">
+            Predicted Category = argmax_c Score(c)
+        </div>
+
+        <h3>Concrete Example</h3>
+        <p>Suppose we see the article:</p>
+
+        <div class="sentence-example">
+            "Stocks rallied on Monday, major indexes gaining 1%"
+        </div>
+
+        <p>We compute scores for each category:</p>
+
+        <div class="example-section">
+            <strong>Business:</strong><br>
+            P(Business) = 0.25<br>
+            P("Stocks"|Business) = 0.85<br>
+            P("Rallied"|Business) = 0.72<br>
+            P("Indexes"|Business) = 0.81<br>
+            P("Gaining"|Business) = 0.68<br>
+            Score(Business) = 0.25 × 0.85 × 0.72 × 0.81 × 0.68 ≈ 0.105<br>
+            <br>
+            <strong>Sports:</strong><br>
+            P(Sports) = 0.25<br>
+            P("Stocks"|Sports) = 0.01 ← Very low, stocks are rare in sports<br>
+            P("Rallied"|Sports) = 0.35 ← Still low<br>
+            Score(Sports) ≈ 0.25 × 0.01 × 0.35 × ... ≈ 0.00005<br>
+            <br>
+            <strong>Winner: Business</strong> (0.105 >> 0.00005)
+        </div>
+
+        <p>Notice how P("Stocks"|Business) is high (stocks appear often in business articles) while P("Stocks"|Sports) is very low. This single feature dominates the classification decision.</p>
+    </div>
+
+    <!-- Section 4: Why It Works -->
+    <div class="dark-card">
+        <h2>Section 4: Why Naive Bayes Works Despite Its Violations</h2>
+
+        <h3>The Core Insight</h3>
+        <p>In our dental example, "Toothache" and "Catch" are not truly independent given a cavity. They might be:</p>
+        <ul>
+            <li>More correlated than Naive Bayes assumes (both indicate a deeper cavity)</li>
+            <li>Less correlated than Naive Bayes assumes (some cavities cause toothache without a catch)</li>
+        </ul>
+
+        <p>But here's the magical part: <span class="highlight">the ranking still works</span>.</p>
+
+        <h3>A Probabilistic Argument</h3>
+        <p>Suppose the true joint probability has dependencies we're ignoring. The Naive Bayes model computes:</p>
+
+        <div class="formula-box">
+            P_NB(Cavity|Toothache, Catch) ∝ P(Cavity) · P(Toothache|Cavity) · P(Catch|Cavity)
+        </div>
+
+        <p>The true probability would account for P(Toothache, Catch | Cavity) directly. But when we compare two hypotheses (Cavity vs. No Cavity), the <span class="highlight">ratio of scores</span> often preserves the correct ranking because the correlation violations affect both hypotheses similarly.</p>
+
+        <div class="analogy-box">
+            <strong>Analogy:</strong> If you're comparing two runners' speeds but your stopwatch runs 10% fast, you still pick the faster runner. The systematic error doesn't break the ranking.
+        </div>
+
+        <h3>Text Classification: Why Keyword Independence Fails</h3>
+        <p>In text classification, keywords are definitely not independent! Consider:</p>
+
+        <div class="example-section">
+            <strong>"first quarter" in a business article:</strong><br>
+            If you see "first", you're much more likely to see "quarter" (and vice versa). They're positively correlated in business writing.<br>
+            <br>
+            Naive Bayes treats them as independent, so it might underestimate or overestimate P("first", "quarter"|Business).<br>
+            <br>
+            But it rarely reverses the ranking: business articles still score higher on business keywords than sports articles do, even with the correlation mismatch.
+        </div>
+    </div>
+
+    <!-- Section 5: Real-World Applications -->
+    <div class="card">
+        <h2>Section 5: Real-World Applications</h2>
+
+        <p>Naive Bayes is used in many practical systems. Let's see how the cause→effects pattern applies:</p>
+
+        <h3>1. Spam Filtering</h3>
+        <div class="example-section">
+            <strong>Cause:</strong> Email is spam or not spam<br>
+            <strong>Effects:</strong> Presence of words like "free", "click", "urgent", "$$$", etc.<br>
+            <strong>Model:</strong> P(Spam|words) = P(Spam) · ∏ P(word_i|Spam)<br>
+            <strong>Classification:</strong> If score > threshold, mark as spam
+        </div>
+
+        <h3>2. Language Detection</h3>
+        <div class="example-section">
+            <strong>Cause:</strong> Document language (English, Spanish, French, German)<br>
+            <strong>Effects:</strong> Presence of language-specific letters and digrams (e.g., "ñ" is rare in English, "th" is rare in Spanish)<br>
+            <strong>Model:</strong> P(Language|letters) = P(Language) · ∏ P(letter_i|Language)<br>
+            <strong>Speed:</strong> Classification happens in milliseconds
+        </div>
+
+        <h3>3. Medical Diagnosis</h3>
+        <div class="example-section">
+            <strong>Cause:</strong> Patient disease (Flu, Cold, COVID, Allergy)<br>
+            <strong>Effects:</strong> Symptoms (fever, cough, sore throat, fatigue, aches)<br>
+            <strong>Model:</strong> P(Disease|symptoms) = P(Disease) · ∏ P(symptom_i|Disease)<br>
+            <strong>Caveat:</strong> Symptoms are highly correlated (both flu and COVID cause fever and cough), so probabilities are miscalibrated. But ranking is usually correct for triage.
+        </div>
+
+        <h3>4. Document Retrieval</h3>
+        <div class="example-section">
+            <strong>Cause:</strong> Relevance (document is relevant or not relevant to query)<br>
+            <strong>Effects:</strong> Query terms present in document<br>
+            <strong>Model:</strong> P(Relevant|query_words) = P(Relevant) · ∏ P(word_i|Relevant)<br>
+            <strong>Use:</strong> Ranking search results by relevance
+        </div>
+
+        <p style="margin-top: 1.5rem;"><span class="highlight">Why is Naive Bayes so practical?</span> It's fast (linear in the number of features), requires little data to train, and produces interpretable results (you can see which features matter most).</p>
+    </div>
+
+    <!-- Section 6: The Math in Detail -->
+    <div class="dark-card">
+        <h2>Section 6: The Computation in Detail</h2>
+
+        <h3>Bayes' Rule Applied</h3>
+        <p>We want to compute P(Cause|observed effects). Bayes' rule says:</p>
+
+        <div class="formula-box">
+            P(Cause|e₁, e₂, ..., eₘ, y₁, y₂, ..., yₖ)
+            = α · P(Cause) · P(e₁, e₂, ..., eₘ|Cause) · P(y₁, y₂, ..., yₖ|Cause)
+        </div>
+
+        <p>Here:</p>
+        <ul>
+            <li><code>e₁, e₂, ..., eₘ</code> are <span class="highlight">observed effects</span> (we see these)</li>
+            <li><code>y₁, y₂, ..., yₖ</code> are <span class="highlight">unobserved effects</span> (we don't see these)</li>
+            <li><code>α</code> is a normalization constant</li>
+        </ul>
+
+        <h3>Applying Conditional Independence</h3>
+        <p>Because each effect is conditionally independent of others given the cause:</p>
+
+        <div class="formula-box">
+            P(e₁, e₂, ..., eₘ|Cause) = P(e₁|Cause) · P(e₂|Cause) · ... · P(eₘ|Cause)
+        </div>
+
+        <p>And we can marginalize out unobserved effects:</p>
+
+        <div class="formula-box">
+            P(y₁, y₂, ..., yₖ|Cause) = Σ P(y₁, y₂, ..., yₖ|Cause) = 1
+        </div>
+
+        <p>They sum to 1 because <code>y₁, y₂, ..., yₖ</code> represent all possible values of unobserved variables, and one of them must be true.</p>
+
+        <h3>The Final Formula (Equation 12.21)</h3>
+        <p>Putting it together, Naive Bayes computes:</p>
+
+        <div class="formula-box-red">
+            P(Cause|observed effects) = α · P(Cause) · ∏ P(eⱼ|Cause)
+        </div>
+
+        <p style="margin-top: 1rem;">Notice: <span class="highlight">no dependence on unobserved effects</span>. They drop out completely because they sum to 1.</p>
+
+        <h3>Computational Complexity</h3>
+        <p>If you observe <em>m</em> effects and want to classify into one of <em>k</em> categories:</p>
+
+        <div class="complexity-comparison">
+            <div class="complexity-row">
+                <span class="complexity-label">Compute P(Cause) for each category:</span>
+                <span class="complexity-value">O(k)</span>
+            </div>
+            <div class="complexity-row">
+                <span class="complexity-label">Compute P(eⱼ|Cause) for each effect and category:</span>
+                <span class="complexity-value">O(m · k)</span>
+            </div>
+            <div class="complexity-row">
+                <span class="complexity-label">Multiply all probabilities:</span>
+                <span class="complexity-value">O(m · k)</span>
+            </div>
+            <div class="complexity-row">
+                <span class="complexity-label"><strong>Total runtime:</strong></span>
+                <span class="complexity-value"><strong>O(m · k)</strong></span>
+            </div>
+        </div>
+
+        <p style="margin-top: 1rem;"><span class="highlight">Linear in the number of observed effects!</span> This is why Naive Bayes scales to millions of features (like words in text classification).</p>
+    </div>
+
+    <!-- Section 7: Try It Yourself -->
+    <div class="try-it">
+        <h2>Try It Yourself: Classify These Sentences</h2>
+
+        <p>Imagine you've trained a Naive Bayes classifier on newspaper articles. For each sentence below, which category would it likely predict? <span class="highlight">Think about which keywords are strong indicators.</span></p>
+
+        <h3>Example 1</h3>
+        <div class="sentence-example">
+            "The quarterback threw a touchdown pass in the fourth quarter"
+        </div>
+        <p><strong>Categories:</strong> Business, Sports, Weather, Science</p>
+        <p style="margin-top: 0.5rem;"><strong>Hint:</strong> Keywords "quarterback" and "touchdown" have very high P(word|Sports). These strongly indicate Sports.</p>
+        <p style="margin-top: 0.5rem;"><strong>Answer:</strong> <span class="highlight">Sports</span> — Keywords like "quarterback" and "touchdown" almost never appear in business or weather articles.</p>
+
+        <h3>Example 2</h3>
+        <div class="sentence-example">
+            "Rainfall increased 15% year-over-year in the spring season"
+        </div>
+        <p><strong>Categories:</strong> Business, Sports, Weather, Science</p>
+        <p style="margin-top: 0.5rem;"><strong>Hint:</strong> "Rainfall" is a weather keyword. But "year-over-year" and "15%" are business keywords!</p>
+        <p style="margin-top: 0.5rem;"><strong>Answer:</strong> <span class="highlight">Weather</span> (probably) — Despite having a business keyword, "rainfall" and "spring season" are very strong weather indicators. But this is an ambiguous example where the model might waver.</p>
+
+        <h3>Example 3</h3>
+        <div class="sentence-example">
+            "Quantum entanglement allows particles to communicate instantaneously"
+        </div>
+        <p><strong>Categories:</strong> Business, Sports, Weather, Science</p>
+        <p style="margin-top: 0.5rem;"><strong>Hint:</strong> "Quantum", "entanglement", "particles" are science-specific terms with very low probability in other categories.</p>
+        <p style="margin-top: 0.5rem;"><strong>Answer:</strong> <span class="highlight">Science</span> — Specialized vocabulary makes this classification very confident.</p>
+
+        <h3>Example 4 (Hard)</h3>
+        <div class="sentence-example">
+            "Crude oil prices fell 3% after Fed announcement"
+        </div>
+        <p><strong>Categories:</strong> Business, Sports, Weather, Science</p>
+        <p style="margin-top: 0.5rem;"><strong>Hint:</strong> "Oil" could be business or weather. "Fed", "prices", "fell" are business keywords. "Fell 3%" suggests numerical data (business).</p>
+        <p style="margin-top: 0.5rem;"><strong>Answer:</strong> <span class="highlight">Business</span> — Multiple business keywords ("prices", "Fed", "fell") outweigh the ambiguous "oil".</p>
+    </div>
+
+    <!-- Section 8: Practical Limitations -->
+    <div class="card">
+        <h2>Section 8: Practical Limitations and Extensions</h2>
+
+        <h3>Limitation 1: The Zero Probability Problem</h3>
+        <p>If a word never appears in training data for a category, its probability P(word|Category) = 0. Then the entire product becomes 0, even if other features are strong indicators.</p>
+
+        <div class="warning-box">
+            <strong>Fix (Laplace smoothing):</strong> Add 1 to all counts before computing probabilities. This prevents zero probabilities while keeping the model trainable on small datasets.
+        </div>
+
+        <h3>Limitation 2: Numerical Underflow</h3>
+        <p>Multiplying many small probabilities (e.g., 0.001 × 0.002 × 0.003 × ...) produces numbers so small that computers round them to zero.</p>
+
+        <div class="step-box">
+            <strong>Fix (log probabilities):</strong> Compute log(P(Cause|effects)) instead of P(Cause|effects). Addition is numerically stable:<br>
+            log(A × B × C) = log(A) + log(B) + log(C)
+        </div>
+
+        <h3>Limitation 3: Correlated Features</h3>
+        <p>As we discussed, real-world features are often correlated. Naive Bayes works despite this, but probabilities are miscalibrated. For applications needing well-calibrated probabilities (not just rankings), use more sophisticated models.</p>
+
+        <h3>Extension: Continuous Features</h3>
+        <p>We've discussed discrete features (word presence, category labels). For continuous features (like temperature, test scores), assume they follow a <span class="highlight">Gaussian (normal) distribution</span> given the cause:</p>
+
+        <div class="formula-box">
+            P(x|Cause) = (1 / (σ√(2π))) · exp(-(x - μ)² / (2σ²))
+        </div>
+
+        <p>During training, compute μ and σ for each feature-cause pair. During classification, use the Gaussian formula instead of discrete probability tables.</p>
+    </div>
+
+    <!-- Summary -->
+    <div class="dark-card">
+        <h2>Summary: Key Takeaways</h2>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2; margin-top: 0;">1. The Pattern</h3>
+            <p>Naive Bayes models one <span class="highlight">cause</span> producing many <span class="highlight">effects</span>. Assuming conditional independence reduces complexity from O(2ⁿ) to O(n).</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">2. Why "Naive"</h3>
+            <p>The independence assumption is almost always violated in reality. But Naive Bayes still works because it preserves the correct <span class="highlight">ranking</span> of hypotheses, even if probabilities are miscalibrated.</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">3. Text Classification</h3>
+            <p>A concrete example: P(Category|words) = P(Category) · ∏ P(word_i|Category). Pick the category with the highest score.</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">4. Why It Works</h3>
+            <p>Violations of independence affect all hypotheses similarly, preserving ranking. Keywords in different categories have very different probabilities, making robust classification possible.</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">5. Real Applications</h3>
+            <p>Spam filtering, language detection, medical diagnosis, document retrieval, and more. Naive Bayes is practical because it's fast (O(n·k)), requires little training data, and produces interpretable results.</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">6. The Math</h3>
+            <p>P(Cause|effects) = α · P(Cause) · ∏ P(eⱼ|Cause). Unobserved effects sum to 1 and drop out, making computation linear.</p>
+        </div>
+
+        <div class="summary-list">
+            <h3 style="color: #a5d7d2;">7. Practical Issues</h3>
+            <p>Handle zero probabilities with Laplace smoothing. Handle underflow with log probabilities. Understand that the model produces rankings, not calibrated probabilities.</p>
+        </div>
+    </div>
+
+    <!-- Final Insight -->
+    <div class="analogy-box" style="margin-top: 2rem; text-align: center;">
+        <p><strong>Final Insight:</strong> Naive Bayes is a masterclass in pragmatism. It makes terrible assumptions, yet remains one of the most effective classifiers ever invented. Sometimes simple and fast beats complex and perfect.</p>
+    </div>
+
+    <div class="bottom-nav">
+      <a href="lesson_5_bayes_rule.html" class="nav-btn prev">&larr; Bayes' Rule</a>
+      <a href="lesson_7_wumpus_world.html" class="nav-btn next">Next: The Wumpus World &rarr;</a>
+    </div>
+
+    </div>
+</body>
+</html>

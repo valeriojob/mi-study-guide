@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 7: The Wumpus World Revisited - Chapter 12.7</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Grid visualization (page-specific) */
+        .grid-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .wumpus-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(4, 70px);
+            grid-gap: 4px;
+            padding: 1rem;
+            background-color: #2d373c;
+            border-radius: 8px;
+        }
+
+        .grid-cell {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 2px solid #ddd;
+            position: relative;
+        }
+
+        .grid-cell.safe {
+            background-color: #d4f1ed;
+            border-color: #a5d7d2;
+            color: #2d373c;
+        }
+
+        .grid-cell.unknown {
+            background-color: #fce4e8;
+            border-color: #d20537;
+            color: #d20537;
+        }
+
+        .grid-cell.visited {
+            background-color: #e8f5f2;
+            border-color: #a5d7d2;
+            color: #2d373c;
+        }
+
+        .grid-label {
+            font-size: 0.7rem;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            opacity: 0.6;
+        }
+
+        .grid-content {
+            font-size: 0.85rem;
+        }
+
+        .grid-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #999;
+        }
+
+        /* Data table (page-specific) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .data-table th {
+            background-color: #a5d7d2;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .data-table tr:hover {
+            background-color: #f0f7f5;
+        }
+
+        .danger-level { font-weight: 600; }
+        .danger-high { color: #d20537; }
+        .danger-medium { color: #d27a00; }
+        .danger-low { color: #2d7a3a; }
+
+        .prob-display {
+            display: inline-block;
+            background-color: #f9fafb;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-weight: 600;
+        }
+
+        /* Models section (page-specific) */
+        .models-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .model-box {
+            background-color: #f9fafb;
+            border: 2px solid #a5d7d2;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .model-title {
+            font-weight: 600;
+            color: #2d373c;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .model-pits {
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            color: #2d373c;
+            margin-bottom: 0.5rem;
+        }
+
+        .model-prob {
+            color: #a5d7d2;
+            font-weight: 600;
+        }
+
+        /* Summary list (page-specific) */
+        .summary-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .summary-list li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .summary-list li:before {
+            content: "\25B8";
+            color: #a5d7d2;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .wumpus-grid {
+                grid-template-columns: repeat(4, 60px);
+            }
+
+            .grid-cell {
+                width: 60px;
+                height: 60px;
+                font-size: 0.75rem;
+            }
+
+            .grid-legend {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+      <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="lesson_1_why_uncertainty.html">1</a>
+        <a href="lesson_2_probability_basics.html">2</a>
+        <a href="lesson_3_full_joint.html">3</a>
+        <a href="lesson_4_independence.html">4</a>
+        <a href="lesson_5_bayes_rule.html">5</a>
+        <a href="lesson_6_naive_bayes.html">6</a>
+        <a href="lesson_7_wumpus_world.html" class="active">7</a>
+        <a href="discussion_guide_ch12.html">💬</a>
+      </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="text-align:center;">The Wumpus World Revisited</h1>
+        <p class="subtitle" style="text-align:center;">Chapter 12.7: Quantifying Uncertainty - Making Smart Decisions in a Risky World</p>
+
+        <!-- Introduction -->
+        <div class="card">
+            <h2>Why We're Revisiting the Wumpus World</h2>
+            <p>You may remember the Wumpus World from Chapter 7, where an agent used <span class="accent-text">logic</span> to navigate a dangerous cave. But logical reasoning has a big limitation: it either knows something for certain or it knows nothing.</p>
+            <p>In this lesson, we're returning to the Wumpus World with a new superpower: <span class="accent-text">probability</span>. Instead of just knowing what's logically possible, we'll be able to rank possibilities by how likely they are. This lets us make smarter decisions even when we're uncertain.</p>
+            <div class="key-insight">
+                <strong>The Central Question:</strong> You've explored three squares and found breezes. Three unexplored squares are reachable. Which one is safest? Logic can't tell us. Probability can.
+            </div>
+        </div>
+
+        <!-- Section 1: What is the Wumpus World? -->
+        <div class="card">
+            <h2>1. What is the Wumpus World?</h2>
+            <p>The Wumpus World is a 4×4 grid cave where an agent explores squares, searching for treasure while avoiding danger.</p>
+
+            <h3>The Setup</h3>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li><strong>The Grid:</strong> 4 columns × 4 rows = 16 squares</li>
+                <li><strong>The Agent:</strong> Explores one square at a time</li>
+                <li><strong>The Danger:</strong> Each square contains a pit with probability <span class="prob-display">0.2</span> (20% chance)</li>
+                <li><strong>Safety Rule:</strong> Square [1,1] (bottom-left) is always safe</li>
+                <li><strong>The Signal:</strong> If an adjacent square has a pit, you feel a <strong>breeze</strong> in your current square</li>
+            </ul>
+
+            <p style="margin-top: 1.5rem;"><strong>Why this setup?</strong> Pits are like hidden dangers. Breezes are like clues. The agent must reason: "I feel a breeze here, so a nearby square probably has a pit. Which one?"</p>
+
+            <h3 style="margin-top: 1.5rem;">The Grid Layout</h3>
+            <p style="margin-bottom: 0.5rem;">Here's our 4×4 grid. In this visualization, we'll show what the agent has discovered:</p>
+            <div class="grid-container">
+                <div>
+                    <div class="wumpus-grid">
+                        <div class="grid-cell visited"><span class="grid-label">[1,4]</span><span class="grid-content">—</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[2,4]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[3,4]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[4,4]</span><span class="grid-content">?</span></div>
+
+                        <div class="grid-cell unknown"><span class="grid-label">[1,3]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[2,3]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[3,3]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[4,3]</span><span class="grid-content">?</span></div>
+
+                        <div class="grid-cell unknown"><span class="grid-label">[1,2]</span><span class="grid-content">B</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[2,2]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[3,2]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[4,2]</span><span class="grid-content">?</span></div>
+
+                        <div class="grid-cell safe"><span class="grid-label">[1,1]</span><span class="grid-content">B</span></div>
+                        <div class="grid-cell visited"><span class="grid-label">[2,1]</span><span class="grid-content">B</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[3,1]</span><span class="grid-content">?</span></div>
+                        <div class="grid-cell unknown"><span class="grid-label">[4,1]</span><span class="grid-content">?</span></div>
+                    </div>
+                    <div class="grid-legend">
+                        <div class="legend-item">
+                            <div class="legend-box" style="background-color: #d4f1ed; border-color: #a5d7d2;"></div>
+                            <span>Visited & Safe</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background-color: #e8f5f2; border-color: #a5d7d2;"></div>
+                            <span>Visited</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background-color: #fce4e8; border-color: #d20537;"></div>
+                            <span>Unknown</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem;"><strong>Reading the grid:</strong> The labels [i,j] use standard coordinates where [1,1] is bottom-left. "B" means a breeze is detected. "?" means we haven't visited yet. The agent can only move to adjacent squares (up, down, left, right).</p>
+        </div>
+
+        <!-- Section 2: The Current Situation -->
+        <div class="dark-card">
+            <h2>2. The Current Situation</h2>
+
+            <h3>What We Know</h3>
+            <p>The agent's exploration so far:</p>
+            <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: white;">
+                <li><strong>Visited squares:</strong> [1,1], [2,1], [1,2]</li>
+                <li><strong>Breezes detected at:</strong> [1,1], [2,1], and [1,2]</li>
+                <li><strong>Certainty:</strong> [1,1], [2,1], [1,2] have <span class="accent-text">no pits</span> (we're standing there!)</li>
+            </ul>
+
+            <h3>The Question: Where to Go Next?</h3>
+            <p>From [1,2], three squares are reachable without visiting a known unsafe area:</p>
+            <ul style="margin-left: 1.5rem; color: white;">
+                <li><strong>[1,3]</strong> — directly above [1,2]</li>
+                <li><strong>[2,2]</strong> — to the right of [1,2]</li>
+                <li><strong>[3,1]</strong> — diagonally adjacent through [2,1]</li>
+            </ul>
+
+            <h3>The Logic Problem</h3>
+            <p>Using only logical reasoning (like in Chapter 7), the agent could determine: "These three squares might have pits, but it's logically possible that any of them is safe."</p>
+            <p><span class="highlight-text">That's not very helpful!</span> We need to know which square is most likely to be safe. This is where probability comes in.</p>
+        </div>
+
+        <!-- Section 3: Setting Up the Probability Model -->
+        <div class="card">
+            <h2>3. Setting Up the Probability Model</h2>
+            <p>To answer "Which square is safest?", we need to set up a probability model. This means defining random variables and their relationships.</p>
+
+            <h3>Random Variables</h3>
+            <p>We'll define two types of random variables for each square:</p>
+
+            <div style="background-color: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <p style="margin-bottom: 0.5rem;"><strong>P<sub>i,j</sub></strong> = "Is there a pit at square [i,j]?"</p>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Takes values: True or False</li>
+                    <li>Prior probability: P(P<sub>i,j</sub> = true) = <span class="prob-display">0.2</span> (for all squares except [1,1])</li>
+                    <li>Each square is independent — finding a pit at [2,2] doesn't change the probability of a pit at [3,3]</li>
+                </ul>
+            </div>
+
+            <div style="background-color: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                <p style="margin-bottom: 0.5rem;"><strong>B<sub>i,j</sub></strong> = "Is there a breeze at square [i,j]?"</p>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Takes values: True or False</li>
+                    <li>Rule: B<sub>i,j</sub> = True if and only if an adjacent square has a pit</li>
+                    <li>This relationship is <span class="accent-text">deterministic</span> (completely determined by the pits)</li>
+                </ul>
+            </div>
+
+            <h3>The Full Joint Distribution</h3>
+            <p>Our probability model assigns a probability to every possible configuration of pits and breezes:</p>
+
+            <div class="formula-box">
+                P(P₁,₁, P₁,₂, ..., P₄,₄, B₁,₁, B₁,₂, ..., B₄,₄)
+                = P(Breezes | Pits) × ∏ P(Pᵢ,ⱼ)
+            </div>
+
+            <p style="margin-top: 1rem;"><strong>What does this mean?</strong> The probability of a complete world state (all pits and all breezes) equals:</p>
+            <ul style="margin-left: 1.5rem;">
+                <li><strong>P(Breezes | Pits):</strong> How likely are the observed breezes, given where the pits are? (This equals 1 if the breezes match the pits, 0 otherwise)</li>
+                <li><strong>∏ P(Pᵢ,ⱼ):</strong> The product of probabilities for each individual pit</li>
+            </ul>
+
+            <div class="analogy-box">
+                <strong>Think of it like this:</strong> Imagine you're trying to reconstruct a mystery. You have clues (the breezes) and suspects (the pit locations). For each possible arrangement of suspects, you ask: "Does this arrangement explain the clues?" If yes, you compute how likely this arrangement is based on your prior beliefs about suspect locations.
+            </div>
+        </div>
+
+        <!-- Section 4: The Naive Approach -->
+        <div class="card">
+            <h2>4. The Naive Approach: Enumerate Everything</h2>
+            <p>In theory, we can solve this problem by enumerating all possible pit configurations and checking which are consistent with the observed breezes.</p>
+
+            <h3>How Many Configurations Are There?</h3>
+            <p>We have 12 unknown pit variables: P₁,₃, P₂,₂, P₂,₃, P₃,₁, P₃,₂, P₃,₃, P₄,₁, P₄,₂, P₄,₃, P₄,₄, and others.</p>
+            <p style="margin-bottom: 0.5rem;">Each can be True or False, so:</p>
+
+            <div class="formula-box">
+                2¹² = 4,096 possible configurations
+            </div>
+
+            <h3>The Algorithm</h3>
+            <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                <li>For each of the 4,096 configurations:
+                    <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Check: Does this configuration produce the breezes we observed?</li>
+                        <li>If yes, compute the probability of this configuration</li>
+                        <li>If no, skip it</li>
+                    </ol>
+                </li>
+                <li>Sum the probabilities for configurations where [1,3] has a pit → P([1,3] has pit | evidence)</li>
+                <li>Repeat for [2,2] and [3,1]</li>
+            </ol>
+
+            <h3>Does It Work?</h3>
+            <p><strong>Yes!</strong> This method is correct. It's called <span class="accent-text">exact inference</span>.</p>
+
+            <h3>What's the Problem?</h3>
+            <p><span class="highlight-text">4,096 configurations is a lot</span> for a small 4×4 grid. In a real-world probabilistic system with many variables, enumeration becomes infeasible. A 10×10 grid would have 2¹⁰⁰ configurations — more than atoms in the universe!</p>
+
+            <div class="warning-box">
+                <strong>Computational Explosion:</strong> Enumeration works for toy problems but fails in real applications. We need smarter methods. That's where conditional independence comes in.
+            </div>
+        </div>
+
+        <!-- Section 5: The Key Insight - Conditional Independence -->
+        <div class="dark-card">
+            <h2>5. The Key Insight: Conditional Independence</h2>
+
+            <h3>The Breakthrough Idea</h3>
+            <p>Here's a crucial observation: once we fix the pit values for the "frontier" squares (those adjacent to visited squares), the breezes at visited squares become independent of the "far away" squares.</p>
+
+            <div class="key-insight">
+                <strong>The Independence Insight:</strong> The breezes we feel depend only on pits in nearby squares. Distant pits don't affect the breeze we feel today. So we can <span class="accent-text">ignore the distant pits</span> when computing probabilities about nearby pits!
+            </div>
+
+            <h3>How We Use This</h3>
+            <p>Let's partition the unknown squares into groups:</p>
+
+            <div style="background-color: #1e2a30; padding: 1rem; border-radius: 8px; margin: 1rem 0; color: #ddd;">
+                <p><strong style="color: #a5d7d2;">Frontier:</strong> Squares adjacent to visited squares</p>
+                <ul style="margin-left: 1.5rem;">
+                    <li>[1,3], [2,2] — can affect breezes at visited squares</li>
+                    <li>[3,1] — can affect breezes at visited squares</li>
+                </ul>
+
+                <p style="margin-top: 1rem;"><strong style="color: #a5d7d2;">Other:</strong> All remaining unknown squares</p>
+                <ul style="margin-left: 1.5rem;">
+                    <li>Squares like [2,3], [3,2], [3,3], [2,4], etc.</li>
+                    <li>These are too far away to affect the breezes we observed</li>
+                </ul>
+            </div>
+
+            <h3>The Mathematical Trick</h3>
+            <p>We can factor out the "Other" squares because they don't affect the observed breezes:</p>
+
+            <div class="formula-box">
+                P(Frontier | Evidence) ∝
+                    P(Evidence | Frontier) ×
+                    Σ_Other P(Other)
+            </div>
+
+            <p style="margin-top: 1rem;">The sum Σ P(Other) over all configurations of "Other" squares equals 1 (it's a probability distribution). So it factors out! This means:</p>
+
+            <div class="formula-box">
+                P(Frontier | Evidence) ∝
+                    P(Evidence | Frontier)
+            </div>
+
+            <h3>What This Saves Us</h3>
+            <p>Instead of enumerating 2¹² = 4,096 configurations, we only enumerate the Frontier:</p>
+
+            <div style="background-color: #1e2a30; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; text-align: center; color: #ddd;">
+                <p style="margin: 0;"><strong style="color: #a5d7d2;">3 frontier variables</strong> (P₁,₃, P₂,₂, P₃,₁)</p>
+                <p style="margin: 0.5rem 0 0 0; font-family: 'Consolas', monospace;">2³ = <span style="display: inline-block; background-color: #a5d7d2; color: #2d373c; padding: 0.25rem 0.75rem; border-radius: 4px; font-weight: bold;">8 configurations</span></p>
+            </div>
+
+            <p style="margin-top: 1rem;"><span class="accent-text">We reduced the problem from 4,096 to just 8!</span> From 2¹² to 2³. This is the power of conditional independence.</p>
+        </div>
+
+        <!-- Section 6: Computing the Probabilities -->
+        <div class="card">
+            <h2>6. The Five Consistent Models & Their Probabilities</h2>
+
+            <h3>What Are Consistent Models?</h3>
+            <p>A model is a specification of which squares have pits. A model is <span class="accent-text">consistent</span> if it produces exactly the breezes we observed: breezes at [1,1], [1,2], and [2,1], and no breeze where not observed.</p>
+
+            <p style="margin-top: 1.5rem;">Let's check all 8 frontier configurations:</p>
+
+            <div class="models-grid">
+                <div class="model-box">
+                    <div class="model-title">Model 1 (Most Likely)</div>
+                    <div class="model-pits">P₂,₂ = true, P₁,₃ = false, P₃,₁ = false</div>
+                    <div class="model-prob">Probability: 0.184</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Only [2,2] has a pit. It's adjacent to [1,2], [2,1], and [2,3], creating breezes at [1,2] and [2,1]. No pit at [1,3] or [3,1], so [1,2] and [2,1] don't feel breezes from them. ✓</p>
+                </div>
+
+                <div class="model-box">
+                    <div class="model-title">Model 2</div>
+                    <div class="model-pits">P₂,₂ = true, P₁,₃ = false, P₃,₁ = true</div>
+                    <div class="model-prob">Probability: 0.074</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Both [2,2] and [3,1] have pits. [2,2] adjacent to [1,2] and [2,1]. [3,1] adjacent to [2,1]. This produces the required breezes. ✓</p>
+                </div>
+
+                <div class="model-box">
+                    <div class="model-title">Model 3</div>
+                    <div class="model-pits">P₂,₂ = false, P₁,₃ = true, P₃,₁ = false</div>
+                    <div class="model-prob">Probability: 0.074</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Only [1,3] has a pit. It's adjacent to [1,2] and [2,3], creating a breeze at [1,2]. But no breeze at [2,1]. ✗ Inconsistent!</p>
+                </div>
+
+                <div class="model-box">
+                    <div class="model-title">Model 4</div>
+                    <div class="model-pits">P₂,₂ = false, P₁,₃ = false, P₃,₁ = true</div>
+                    <div class="model-prob">Probability: 0.074</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Only [3,1] has a pit. It's adjacent to [2,1] and [3,2], creating a breeze at [2,1]. But no breeze at [1,2]. ✗ Inconsistent!</p>
+                </div>
+
+                <div class="model-box">
+                    <div class="model-title">Model 5</div>
+                    <div class="model-pits">P₂,₂ = true, P₁,₃ = true, P₃,₁ = false</div>
+                    <div class="model-prob">Probability: 0.074</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Both [2,2] and [1,3] have pits. [2,2] creates breeze at [1,2] and [2,1]. [1,3] creates breeze at [1,2]. Both observed breezes explained. ✓</p>
+                </div>
+
+                <div class="model-box">
+                    <div class="model-title">Models 6-8</div>
+                    <div class="model-pits">Various configurations with all three pit squares</div>
+                    <div class="model-prob">Probability: (combined) 0.318</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">These configurations have all three frontier pits or combinations that create inconsistent breeze patterns.</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Normalizing Probabilities</h3>
+            <p>After checking all 8 configurations, we sum the probabilities of consistent models and normalize. This gives us:</p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Square</th>
+                        <th>P(Pit | Evidence)</th>
+                        <th>Danger Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>[1,3]</strong></td>
+                        <td><span class="prob-display">≈ 0.31</span></td>
+                        <td><span class="danger-level danger-medium">Medium Risk</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>[2,2]</strong></td>
+                        <td><span class="prob-display danger-high" style="color: #d20537;">≈ 0.86</span></td>
+                        <td><span class="danger-level danger-high">Very Dangerous!</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>[3,1]</strong></td>
+                        <td><span class="prob-display">≈ 0.31</span></td>
+                        <td><span class="danger-level danger-medium">Medium Risk</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="key-insight" style="margin-top: 2rem;">
+                <strong>The Key Numbers:</strong>
+                <ul style="margin: 0.5rem 0 0 0; margin-left: 1.5rem;">
+                    <li>[1,3]: 31% chance of pit</li>
+                    <li>[2,2]: 86% chance of pit (nearly certain!)</li>
+                    <li>[3,1]: 31% chance of pit</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 7: The Logical Agent vs The Probabilistic Agent -->
+        <div class="dark-card">
+            <h2>7. Logic vs. Probability: A Crucial Difference</h2>
+
+            <h3>What the Logical Agent Knows</h3>
+            <p>From Chapter 7, a logical agent using knowledge representation and inference would conclude:</p>
+            <ul style="margin-left: 1.5rem; color: white;">
+                <li>Pit(2,2) ∨ Pit(1,3) ∨ Pit(3,1) (at least one of these has a pit)</li>
+                <li>But all three are potentially safe squares</li>
+            </ul>
+            <p style="margin-top: 1rem;">The logical agent essentially says: "I have no preference. Pick any of the three."</p>
+
+            <h3>What the Probabilistic Agent Knows</h3>
+            <p>Our probabilistic agent can rank them by safety:</p>
+            <ul style="margin-left: 1.5rem; color: white;">
+                <li><span class="highlight-text">[1,3]: Safest (69% safe)</span></li>
+                <li>[3,1]: Equally safe (69% safe)</li>
+                <li><span class="highlight-text">[2,2]: Very dangerous (only 14% safe!)</span></li>
+            </ul>
+
+            <h3 style="margin-top: 1.5rem;">Why Does Probability Give More Information?</h3>
+            <p>Logic only tracks <span class="accent-text">what's possible</span>. Probability assigns <span class="accent-text">degrees of belief</span> to possibilities. Degrees of belief are richer information:</p>
+
+            <ul style="margin-left: 1.5rem; color: white;">
+                <li><strong>Logic:</strong> "It might rain tomorrow" (binary: possible or impossible)</li>
+                <li><strong>Probability:</strong> "There's a 70% chance of rain tomorrow" (degrees: very likely, somewhat likely, unlikely, etc.)</li>
+            </ul>
+
+            <div style="background-color: #1a252b; border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem;">
+                <p style="margin: 0;"><strong style="color: #a5d7d2;">The Insight:</strong> Both agents have the same observations (breezes). The logical agent says "anything is possible." The probabilistic agent says "some things are much more likely than others." That extra information makes better decisions possible.</p>
+            </div>
+        </div>
+
+        <!-- Section 8: Connecting to Chapter 12 Themes -->
+        <div class="card">
+            <h2>8. Connecting to the Bigger Picture</h2>
+
+            <h3>Three Big Ideas in This Example</h3>
+
+            <div style="border-left: 5px solid #a5d7d2; padding-left: 1.5rem; margin: 1.5rem 0;">
+                <h4 style="margin-top: 0; color: #a5d7d2;">Independence</h4>
+                <p>Each square independently has a 20% chance of containing a pit. The pit at [2,2] doesn't influence the probability of a pit at [3,3]. This independence simplifies our probability model — without it, we'd need to specify relationships between every pair of squares.</p>
+            </div>
+
+            <div style="border-left: 5px solid #a5d7d2; padding-left: 1.5rem; margin: 1.5rem 0;">
+                <h4 style="margin-top: 0; color: #a5d7d2;">Conditional Independence</h4>
+                <p>Given the pit locations, breezes are independent of distant pits. This is why we could factor out the "Other" squares. Conditional independence lets us decompose a hard problem into easier subproblems — in this case, from 4,096 configurations to 8.</p>
+            </div>
+
+            <div style="border-left: 5px solid #a5d7d2; padding-left: 1.5rem; margin: 1.5rem 0;">
+                <h4 style="margin-top: 0; color: #a5d7d2;">Bayesian Inference</h4>
+                <p>We combined prior knowledge (prior probability of pits) with observed evidence (breezes) to compute posterior probabilities (probability given evidence). This is Bayes' rule in action: asking "what's the probability of pits given what I've observed?"</p>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Why Does This Matter?</h3>
+            <p>The Wumpus World is a toy problem, but these three ideas are used everywhere:</p>
+            <ul style="margin-left: 1.5rem;">
+                <li><strong>Medical Diagnosis:</strong> "Patient has symptom X. What's the probability of disease Y?" (Bayesian inference)</li>
+                <li><strong>Spam Detection:</strong> "This email has certain words. Likely spam or legitimate?" (Conditional independence helps: we treat words independently)</li>
+                <li><strong>Robotics:</strong> "Robot sensed obstacle. How confident?" (Combining sensor independence with evidence)</li>
+                <li><strong>Weather Prediction:</strong> "Current conditions suggest..." (Bayesian networks use conditional independence)</li>
+            </ul>
+
+            <div class="analogy-box" style="margin-top: 1.5rem;">
+                <strong>The Principle:</strong> Many real-world systems have independence structure (some things don't affect others) or conditional independence (things become independent once you know key information). Exploiting this structure is how probabilistic AI scales from toy problems to real applications.
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="dark-card">
+            <h2>Summary: What You've Learned</h2>
+
+            <ul class="summary-list">
+                <li><strong>The Wumpus World</strong> is a 4×4 grid where an agent explores, facing hidden dangers (pits) revealed by clues (breezes).</li>
+
+                <li><strong>The Problem:</strong> Given observed breezes, which unexplored square is safest? Logic can't answer this; probability can.</li>
+
+                <li><strong>The Probability Model:</strong> Random variables for pits (P_ij) and breezes (B_ij), with a full joint distribution combining prior probabilities and deterministic breeze rules.</li>
+
+                <li><strong>Naive Approach:</strong> Enumerate all 2^12 = 4,096 pit configurations. It works but is computationally expensive.</li>
+
+                <li><strong>The Key Insight — Conditional Independence:</strong> Distant pits don't affect observed breezes, so they factor out. This reduces 4,096 configurations to just 8 frontier configurations.</li>
+
+                <li><strong>The Results:</strong>
+                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                        <li>[1,3]: 31% chance of pit (safe to visit)</li>
+                        <li>[2,2]: 86% chance of pit (very dangerous!)</li>
+                        <li>[3,1]: 31% chance of pit (safe to visit)</li>
+                    </ul>
+                </li>
+
+                <li><strong>Logic vs. Probability:</strong> A logical agent can't distinguish between the three squares. A probabilistic agent knows [2,2] is far more dangerous. Probability gives us degrees of belief, not just binary possibilities.</li>
+
+                <li><strong>Broader Impact:</strong> This example combines independence, conditional independence, and Bayesian inference — three core ideas from Chapter 12 — to solve a realistic problem. These principles scale to medical diagnosis, spam detection, robotics, and more.</li>
+            </ul>
+
+            <div style="background-color: #1a252b; border-radius: 8px; padding: 1.5rem; margin-top: 2rem;">
+                <p style="margin: 0;"><strong style="color: #a5d7d2;">The Big Takeaway:</strong> Probability lets us quantify uncertainty and make better decisions than pure logic can. By understanding independence and conditional independence, we can even make sophisticated probabilistic reasoning tractable on real problems.</p>
+            </div>
+        </div>
+
+        <!-- Additional Resources -->
+        <div class="card">
+            <h2>Key Formulas to Remember</h2>
+
+            <div class="formula-box">
+                Full Joint Distribution:
+                P(P₁,₁, ..., P₄,₄, B₁,₁, ..., B₄,₄) = P(B|P) · ∏ P(Pᵢ,ⱼ)
+            </div>
+
+            <div class="formula-box">
+                Bayes' Rule:
+                P(Query | Evidence) = P(Evidence | Query) · P(Query) / P(Evidence)
+            </div>
+
+            <div class="formula-box">
+                Conditional Independence:
+                P(X | Y, Z) = P(X | Z) when X ⊥ Y | Z
+                (X is independent of Y given Z)
+            </div>
+
+            <div class="formula-box">
+                Prior Probability:
+                P(Pit at [i,j]) = 0.2 for all [i,j] except [1,1]
+            </div>
+        </div>
+
+        <!-- Reflection Questions -->
+        <div class="card">
+            <h2>Reflection Questions</h2>
+            <p>Think about these to deepen your understanding:</p>
+            <ol style="margin-left: 1.5rem;">
+                <li>Why is [2,2] so much more dangerous (86%) than [1,3] or [3,1] (31%)? Hint: What's special about [2,2]'s location?</li>
+                <li>If the agent moved to [1,3] and felt a breeze, how would the probabilities for [2,2] change?</li>
+                <li>How would the analysis change if we increased the prior probability of pits from 0.2 to 0.5?</li>
+                <li>Why was conditioning on the pit values so important for factoring out the "Other" squares?</li>
+                <li>Can you think of a real-world scenario (medical diagnosis, email filtering, etc.) that has the same structure as this problem?</li>
+            </ol>
+        </div>
+
+        <div class="bottom-nav">
+          <a href="lesson_6_naive_bayes.html" class="nav-btn prev">&larr; Naïve Bayes</a>
+          <a href="discussion_guide_ch12.html" class="nav-btn next">Next: Discussion Guide &rarr;</a>
+        </div>
+    </div>
+</body>
+</html>

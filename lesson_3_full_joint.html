@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 12.3: Inference Using Full Joint Distributions</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .card h2 {
+            color: #2d373c;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #a5d7d2;
+        }
+
+        .card h3 {
+            color: #2d373c;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .dark-card h2 {
+            border-bottom-color: #a5d7d2;
+        }
+
+        table tbody tr td:last-child {
+            color: #d20537;
+            font-weight: 600;
+            font-family: 'Consolas', monospace;
+        }
+
+        .term-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .term-list .term {
+            background: rgba(165, 215, 210, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #a5d7d2;
+            display: block;
+        }
+
+        .term-list .term strong {
+            color: #2d373c;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .term-list .term p {
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        .summary-section h2 {
+            border-bottom-color: #a5d7d2;
+        }
+
+        .step-by-step {
+            background: #f0f9ff;
+            border: 1px solid #a5d7d2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .step-by-step ol {
+            margin-left: 1.5rem;
+        }
+
+        .step-by-step li {
+            margin-bottom: 1rem;
+        }
+
+        .step-by-step li strong {
+            color: #2d373c;
+        }
+
+        .comparison-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison-item {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .comparison-item h4 {
+            color: #a5d7d2;
+            margin-bottom: 0.5rem;
+        }
+
+        .intro-box {
+            background: #e8f5f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #a5d7d2;
+        }
+
+        .intro-box p {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .term-list { grid-template-columns: 1fr; }
+            .comparison-box { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+      <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="lesson_1_why_uncertainty.html">1</a>
+        <a href="lesson_2_probability_basics.html">2</a>
+        <a href="lesson_3_full_joint.html" class="active">3</a>
+        <a href="lesson_4_independence.html">4</a>
+        <a href="lesson_5_bayes_rule.html">5</a>
+        <a href="lesson_6_naive_bayes.html">6</a>
+        <a href="lesson_7_wumpus_world.html">7</a>
+        <a href="discussion_guide_ch12.html">💬</a>
+      </div>
+    </nav>
+
+    <div class="container">
+        <h1>Chapter 12.3: Inference Using Full Joint Distributions</h1>
+        <p class="subtitle">Understanding how to answer probabilistic questions from a complete table of all possibilities</p>
+
+        <!-- Introduction -->
+        <div class="card intro-box">
+            <p><strong>What you'll learn:</strong> In this chapter, we explore the most straightforward (but impractical) way to do probabilistic inference: using a table that lists the probability of every possible combination of events. You'll see how to answer any question by looking up and adding values from this table, and why this simple approach breaks down for real problems.</p>
+        </div>
+
+        <!-- Section 1: The Full Joint Distribution -->
+        <div class="card">
+            <h2>1. The Full Joint Distribution</h2>
+
+            <p>A <span class="probability">full joint probability distribution</span> is simply a table that shows the probability of every possible combination of events. It's the most complete description of uncertainty we can have.</p>
+
+            <div class="analogy-box">
+                <strong>Think of it like this:</strong> Imagine you catalogue every weather scenario for your city. Sunny-and-warm, sunny-and-cold, rainy-and-warm, rainy-and-cold, snowy-and-cold... and you list how likely each is. That table IS your full joint distribution.
+            </div>
+
+            <h3>The Dentist's Office Example</h3>
+            <p>Let's use our running example with three Boolean variables (true/false):</p>
+            <ul style="margin-left: 2rem; margin-top: 0.8rem;">
+                <li><strong>Cavity</strong> = true if you have a cavity, false otherwise</li>
+                <li><strong>Toothache</strong> = true if you have a toothache, false otherwise</li>
+                <li><strong>Catch</strong> = true if the dental probe catches (dentist finds it), false otherwise</li>
+            </ul>
+
+            <p style="margin-top: 1.5rem;">With 3 Boolean variables, we need <strong>2 × 2 × 2 = 8 rows</strong> in our table, one for every possible combination:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cavity</th>
+                        <th>Toothache</th>
+                        <th>Catch</th>
+                        <th>Probability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>true</td><td>true</td><td>true</td><td>0.108</td></tr>
+                    <tr><td>true</td><td>true</td><td>false</td><td>0.012</td></tr>
+                    <tr><td>true</td><td>false</td><td>true</td><td>0.072</td></tr>
+                    <tr><td>true</td><td>false</td><td>false</td><td>0.008</td></tr>
+                    <tr><td>false</td><td>true</td><td>true</td><td>0.016</td></tr>
+                    <tr><td>false</td><td>true</td><td>false</td><td>0.064</td></tr>
+                    <tr><td>false</td><td>false</td><td>true</td><td>0.144</td></tr>
+                    <tr><td>false</td><td>false</td><td>false</td><td>0.576</td></tr>
+                </tbody>
+            </table>
+
+            <div class="key-insight">
+                <strong>Critical property:</strong> All probabilities in the table sum to exactly 1.0 (0.108 + 0.012 + 0.072 + 0.008 + 0.016 + 0.064 + 0.144 + 0.576 = 1.0). This must be true for any valid probability distribution!
+            </div>
+
+            <h3>What Does Each Row Mean?</h3>
+            <p>Each row represents one specific scenario. For example:</p>
+            <ul style="margin-left: 2rem; margin-top: 0.8rem;">
+                <li>Row 1: You have a cavity (true), feel a toothache (true), and the probe catches (true). This happens with probability 0.108 (about 10.8% of the time).</li>
+                <li>Row 8: You have no cavity (false), no toothache (false), and the probe doesn't catch (false). This is the most likely scenario at 57.6%!</li>
+            </ul>
+        </div>
+
+        <!-- Section 2: Answering Queries -->
+        <div class="card">
+            <h2>2. Answering Any Query with the Joint Distribution</h2>
+
+            <p>Here's the beautiful power of the full joint distribution: <strong>you can answer ANY question by summing the appropriate entries</strong>.</p>
+
+            <div class="key-insight">
+                <strong>The core idea:</strong> If you want to know the probability of some event, add up the probabilities of all the rows that match that event.
+            </div>
+
+            <h3>Example 1: Simple Query</h3>
+            <p><strong>Question:</strong> What is P(Cavity = true)?</p>
+            <p style="margin-top: 1rem;">We need to sum rows where Cavity is true (rows 1-4):</p>
+
+            <div class="example-step">
+                <strong>P(Cavity = true) = 0.108 + 0.012 + 0.072 + 0.008 = 0.2</strong><br>
+                <span style="color: #666; font-size: 0.95rem;">There's a 20% chance you have a cavity.</span>
+            </div>
+
+            <h3>Example 2: Disjunction (OR) Query</h3>
+            <p><strong>Question:</strong> What is P(Cavity ∨ Toothache)? (Probability that you have a cavity OR a toothache, or both)</p>
+            <p style="margin-top: 1rem;">We sum all rows where at least one is true. It's easier to use the complement:</p>
+
+            <div class="example-step">
+                <strong>P(Cavity ∨ Toothache) = 1 - P(¬Cavity ∧ ¬Toothache)</strong><br>
+                <strong>= 1 - (0.144 + 0.576)</strong><br>
+                <strong>= 1 - 0.72 = 0.28</strong><br>
+                <span style="color: #666; font-size: 0.95rem;">There's a 28% chance you have either a cavity or toothache.</span>
+            </div>
+
+            <h3>Example 3: Conjunction (AND) Query</h3>
+            <p><strong>Question:</strong> What is P(Cavity ∧ Toothache)? (Probability of both a cavity AND a toothache)</p>
+            <p style="margin-top: 1rem;">Sum only rows where both are true (rows 1-2):</p>
+
+            <div class="example-step">
+                <strong>P(Cavity ∧ Toothache) = 0.108 + 0.012 = 0.12</strong><br>
+                <span style="color: #666; font-size: 0.95rem;">There's a 12% chance you have both.</span>
+            </div>
+
+            <div class="analogy-box">
+                <strong>The pattern:</strong> To answer any question, just look at the table and add up the rows that match what you're asking about. It's like filtering a spreadsheet and summing a column!
+            </div>
+        </div>
+
+        <!-- Section 3: Marginalization -->
+        <div class="card">
+            <h2>3. Marginalization: Summing Out Variables</h2>
+
+            <p><span class="probability">Marginalization</span> means: "I only care about some variables, so I'll ignore (sum out) the others." You're calculating the probability of one or more variables without caring what happens with the rest.</p>
+
+            <div class="analogy-box">
+                <strong>Think of it like this:</strong> You have a table of weather data (Temperature, Humidity, Cloud Coverage, Pressure). If you only care about the relationship between Temperature and Humidity, you <em>marginalize out</em> the other two by lumping together all cases with the same Temperature and Humidity, regardless of clouds or pressure.
+            </div>
+
+            <h3>The General Formula</h3>
+            <div class="formula-box">
+                P(Y) = Σ<sub>z</sub> P(Y, Z=z)
+            </div>
+            <p style="text-align: center; color: #666; font-size: 0.95rem;">In English: "The probability of Y equals the sum over all possible values of Z of the joint probability of Y and Z."</p>
+
+            <h3>Worked Example: P(Cavity)</h3>
+            <p>We already calculated P(Cavity) above by summing rows. Let's think of it differently using marginalization:</p>
+
+            <p style="margin-top: 1rem;"><strong>We want to ignore (marginalize out) Toothache and Catch.</strong></p>
+
+            <div class="example-step">
+                <strong>P(Cavity = true) = Σ<sub>toothache, catch</sub> P(Cavity=true, Toothache, Catch)</strong><br><br>
+                Sum all rows where Cavity is true:<br>
+                = P(C,T,Ca) + P(C,T,¬Ca) + P(C,¬T,Ca) + P(C,¬T,¬Ca)<br>
+                = 0.108 + 0.012 + 0.072 + 0.008<br>
+                <strong>= 0.2</strong>
+            </div>
+
+            <h3>Another Example: P(Toothache)</h3>
+            <p><strong>Question:</strong> What is the overall probability of having a toothache?</p>
+
+            <div class="example-step">
+                Sum all rows where Toothache = true:<br>
+                <strong>P(Toothache) = 0.108 + 0.012 + 0.016 + 0.064 = 0.2</strong><br>
+                <span style="color: #666; font-size: 0.95rem;">Also 20%! Interesting coincidence in this example.</span>
+            </div>
+
+            <h3>Two-Variable Marginalization: P(Cavity, Toothache)</h3>
+            <p>We can marginalize out just one variable. For instance, what's P(Cavity = true AND Toothache = true)?</p>
+
+            <div class="example-step">
+                We sum over all values of Catch:<br>
+                <strong>P(Cavity, Toothache) = P(C,T,Ca) + P(C,T,¬Ca) = 0.108 + 0.012 = 0.12</strong>
+            </div>
+
+            <div class="key-insight">
+                <strong>The key insight:</strong> When you marginalize, you're throwing away information about variables you don't care about. You group together scenarios that differ only in those ignored variables and add their probabilities. This is how we go from a table with 8 rows to a table with 4 rows (by marginalizing out one variable), or 2 rows (marginalizing out two).
+            </div>
+        </div>
+
+        <!-- Section 4: Conditioning -->
+        <div class="card">
+            <h2>4. Conditioning: Computing Conditional Probabilities</h2>
+
+            <p><span class="probability">Conditioning</span> means: "Given that we've observed something, what's the probability of something else?" This is where the full joint distribution becomes extremely useful.</p>
+
+            <h3>The Conditional Probability Formula</h3>
+            <div class="formula-box">
+                P(X|e) = P(X ∧ e) / P(e)
+            </div>
+            <p style="text-align: center; color: #666; font-size: 0.95rem;">Probability of X given evidence e equals the joint probability of both, divided by the probability of the evidence.</p>
+
+            <div class="analogy-box">
+                <strong>Intuition:</strong> Out of all the worlds where the evidence is true, what fraction also have X true? That's the conditional probability.
+            </div>
+
+            <h3>Step-by-Step Worked Example: P(Cavity | Toothache)</h3>
+            <p><strong>Question:</strong> "I have a toothache. What's the probability I actually have a cavity?"</p>
+
+            <div class="step-by-step">
+                <ol>
+                    <li>
+                        <strong>Identify what we need:</strong><br>
+                        We need P(Cavity=true | Toothache=true)<br>
+                        Formula: P(Cavity | Toothache) = P(Cavity ∧ Toothache) / P(Toothache)
+                    </li>
+                    <li>
+                        <strong>Calculate the numerator: P(Cavity ∧ Toothache)</strong><br>
+                        Sum rows where both are true (rows 1-2):<br>
+                        <span class="probability">P(Cavity ∧ Toothache) = 0.108 + 0.012 = 0.12</span>
+                    </li>
+                    <li>
+                        <strong>Calculate the denominator: P(Toothache)</strong><br>
+                        Sum all rows where Toothache is true (rows 1-2, 5-6):<br>
+                        <span class="probability">P(Toothache) = 0.108 + 0.012 + 0.016 + 0.064 = 0.2</span>
+                    </li>
+                    <li>
+                        <strong>Divide:</strong><br>
+                        <span class="probability">P(Cavity | Toothache) = 0.12 / 0.2 = 0.6</span><br>
+                        <span style="color: #666; font-size: 0.95rem;">So if you have a toothache, there's a 60% chance you have a cavity.</span>
+                    </li>
+                </ol>
+            </div>
+
+            <h3>Another Example: P(Cavity | Catch)</h3>
+            <p><strong>Question:</strong> "The dentist's probe caught. What's the probability I have a cavity?"</p>
+
+            <div class="example-step">
+                <strong>Numerator:</strong> P(Cavity ∧ Catch) = 0.108 + 0.072 = 0.18<br>
+                <strong>Denominator:</strong> P(Catch) = 0.108 + 0.072 + 0.016 + 0.144 = 0.34<br>
+                <strong>Result:</strong> P(Cavity | Catch) = 0.18 / 0.34 ≈ 0.529<br>
+                <span style="color: #666; font-size: 0.95rem;">About 52.9% chance you have a cavity if the probe catches.</span>
+            </div>
+
+            <h3>Multiple Evidence: P(Cavity | Toothache ∧ Catch)</h3>
+            <p><strong>Question:</strong> "I have a toothache AND the probe caught. What's the probability I have a cavity?"</p>
+
+            <div class="example-step">
+                <strong>Numerator:</strong> P(Cavity ∧ Toothache ∧ Catch) = 0.108<br>
+                <strong>Denominator:</strong> P(Toothache ∧ Catch) = 0.108 + 0.016 = 0.124<br>
+                <strong>Result:</strong> P(Cavity | Toothache ∧ Catch) = 0.108 / 0.124 ≈ 0.871<br>
+                <span style="color: #666; font-size: 0.95rem;">About 87.1% chance! More evidence makes it much more certain.</span>
+            </div>
+
+            <div class="key-insight">
+                <strong>Why this works:</strong> The full joint distribution encodes all the relationships between variables. By dividing the joint probability of X and the evidence by the probability of just the evidence, we isolate the probability of X in the worlds where the evidence is true.
+            </div>
+        </div>
+
+        <!-- Section 5: The Normalization Trick -->
+        <div class="card">
+            <h2>5. The Normalization Trick: Using α</h2>
+
+            <p>Computing conditional probabilities requires dividing by P(evidence). There's a clever trick to avoid this: compute unnormalized probabilities, then rescale them so they sum to 1. The Greek letter <span class="probability">α (alpha)</span> represents this scaling factor.</p>
+
+            <h3>Why This Matters</h3>
+            <p>Computing P(evidence) requires summing over all combinations of values for all the unobserved variables. For large problems, this can be expensive. But we often don't care about the exact denominator—we just want to know the relative probabilities.</p>
+
+            <div class="analogy-box">
+                <strong>Think of it like this:</strong> You're deciding between restaurants. One is 5 stars with 200 reviews, another is 4.8 stars with 100 reviews. You don't need to verify the exact counts—you just need to know the relative quality to make a decision. The normalization trick is similar.
+            </div>
+
+            <h3>The Method: Step by Step</h3>
+
+            <h4 style="margin-top:1rem;">Example: P(Cavity | Toothache)</h4>
+
+            <div class="example-step">
+                <strong>Step 1: Compute unnormalized probabilities for each value of Cavity</strong><br><br>
+                For Cavity = true:<br>
+                P(Cavity=T, Toothache=T) = 0.108 + 0.012 = 0.12<br><br>
+                For Cavity = false:<br>
+                P(Cavity=F, Toothache=T) = 0.016 + 0.064 = 0.08<br><br>
+                <strong>Unnormalized:</strong> ⟨0.12, 0.08⟩
+            </div>
+
+            <div class="example-step">
+                <strong>Step 2: Normalize by dividing each by their sum</strong><br><br>
+                Sum = 0.12 + 0.08 = 0.20<br>
+                α = 1/0.20 = 5<br><br>
+                Normalized: ⟨0.12×5, 0.08×5⟩ = ⟨0.6, 0.4⟩
+            </div>
+
+            <div class="key-insight">
+                <strong>The notation:</strong> We write P(Cavity | Toothache) = α ⟨0.12, 0.08⟩ where α is a normalization constant. It means: "compute these two values, then normalize them." The actual value of α doesn't matter—only that it makes the probabilities sum to 1.
+            </div>
+
+            <h3>The General Pattern</h3>
+            <div class="formula-box">
+                P(X | e) = α ⟨P(X=x₁, e), P(X=x₂, e), ..., P(X=xₙ, e)⟩
+            </div>
+            <p style="text-align: center; color: #666; font-size: 0.95rem;">For each possible value of X, compute the joint probability with the evidence, then normalize.</p>
+
+            <h3>Why Use Normalization?</h3>
+            <ul style="margin-left: 2rem; margin-top: 0.8rem;">
+                <li>We only need to compute the numerator, not the full denominator</li>
+                <li>For multiple unobserved variables, this saves massive computation</li>
+                <li>The normalized probabilities automatically sum to 1</li>
+                <li>We get the same answer as the direct method</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>Important:</strong> The normalization trick is a computational shortcut. It doesn't change the meaning—you still need to actually compute those joint probabilities. But by deferring the division until the end, you can sometimes save work (especially in more complex inference algorithms).
+            </div>
+        </div>
+
+        <!-- Section 6: The General Inference Equation -->
+        <div class="card">
+            <h2>6. The General Inference Equation</h2>
+
+            <p>All inference from a full joint distribution comes down to one equation:</p>
+
+            <div class="formula-box">
+                P(X|e) = α Σ<sub>y</sub> P(X, e, y)
+            </div>
+
+            <p style="text-align: center; color: #666; font-size: 0.95rem; margin-bottom: 1.5rem;">Probability of query X given evidence e equals α times the sum over unobserved variables y of the joint probability.</p>
+
+            <h3>Decoding the Notation</h3>
+
+            <div class="comparison-box">
+                <div class="comparison-item">
+                    <h4>P(X|e)</h4>
+                    <p>What we want to compute: the probability of the query X given the evidence e.</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>α</h4>
+                    <p>A normalization constant (we don't compute it explicitly, we just normalize at the end).</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>Σ<sub>y</sub></h4>
+                    <p>Sum over all possible values of the unobserved variables y.</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>P(X, e, y)</h4>
+                    <p>The joint probability of all three: the query, the evidence, and the unobserved variables.</p>
+                </div>
+            </div>
+
+            <h3>Applied to Our Example</h3>
+            <p><strong>Question:</strong> P(Cavity | Toothache = true, Catch = false)?</p>
+
+            <div class="example-step">
+                <strong>Identify:</strong><br>
+                X = Cavity (what we want)<br>
+                e = Toothache=true, Catch=false (evidence)<br>
+                y = (nothing left to sum over in this case)<br><br>
+                <strong>Computation:</strong><br>
+                P(Cavity | T, ¬Ca) = α P(Cavity, T, ¬Ca)<br>
+                P(Cavity=T, T, ¬Ca) = 0.012<br>
+                P(Cavity=F, T, ¬Ca) = 0.064<br><br>
+                <strong>Normalize:</strong><br>
+                Sum = 0.012 + 0.064 = 0.076<br>
+                P(Cavity=T | T, ¬Ca) = 0.012 / 0.076 ≈ 0.158<br>
+                P(Cavity=F | T, ¬Ca) = 0.064 / 0.076 ≈ 0.842
+            </div>
+
+            <h3>Why This Equation Works</h3>
+            <p>This equation works because:</p>
+            <ul style="margin-left: 2rem; margin-top: 0.8rem;">
+                <li>We sum over the unobserved variables (marginalization) to get the joint probability of query + evidence</li>
+                <li>We divide by P(evidence) implicitly through normalization</li>
+                <li>The division isolates just the cases where the evidence is true</li>
+            </ul>
+
+            <div class="key-insight">
+                <strong>Universal principle:</strong> Every inference algorithm in probability—from Bayesian networks to Markov Random Fields to deep learning—ultimately comes down to computing these kinds of sums. This equation is the foundation!
+            </div>
+        </div>
+
+        <!-- Section 7: The Scalability Problem -->
+        <div class="card dark-card">
+            <h2>7. The Scalability Problem: Why This Doesn't Scale</h2>
+
+            <p>The full joint distribution is conceptually perfect. It can answer any query. But there's a massive, practical problem: <strong>it grows exponentially</strong>.</p>
+
+            <h3>The Exponential Explosion</h3>
+
+            <p>For n Boolean variables, the full joint distribution has <strong>2<sup>n</sup> rows</strong>:</p>
+
+            <table style="background: #1a2027; margin: 1.5rem 0;">
+                <thead>
+                    <tr style="background: #0d0f13;">
+                        <th style="color: #a5d7d2;">Number of Variables</th>
+                        <th style="color: #a5d7d2;">Number of Rows</th>
+                        <th style="color: #a5d7d2;">Practical?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">3 (dentist example)</td>
+                        <td style="color: #a5d7d2;">8</td>
+                        <td style="color: #4caf50;">Yes ✓</td>
+                    </tr>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">10</td>
+                        <td style="color: #a5d7d2;">1,024</td>
+                        <td style="color: #4caf50;">Yes ✓</td>
+                    </tr>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">20</td>
+                        <td style="color: #a5d7d2;">1,048,576 (~1M)</td>
+                        <td style="color: #ff9800;">Uncomfortable</td>
+                    </tr>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">30</td>
+                        <td style="color: #a5d7d2;">1,073,741,824 (~1 billion)</td>
+                        <td style="color: #f44336;">No ✗</td>
+                    </tr>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">50</td>
+                        <td style="color: #a5d7d2;">1,125,899,906,842,624 (~10<sup>15</sup>)</td>
+                        <td style="color: #f44336;">No ✗</td>
+                    </tr>
+                    <tr style="border-bottom-color: #444;">
+                        <td style="color: white;">100</td>
+                        <td style="color: #a5d7d2;">1,267,650,600,228,229,401,496,703,205,376 (~10<sup>30</sup>)</td>
+                        <td style="color: #f44336;">No ✗</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>A Concrete Nightmare</h3>
+            <p style="margin-top: 1.5rem;">Imagine a medical diagnosis system with just 100 symptoms and conditions (which is tiny for real medicine). That's 2<sup>100</sup> ≈ 10<sup>30</sup> possible combinations.</p>
+
+            <div class="warning-box">
+                <strong>Reality check:</strong> There are only about 10<sup>80</sup> atoms in the observable universe. You'd need to store 2<sup>100</sup> numbers, which is 10<sup>30</sup> combinations. Your entire computer couldn't hold it. At 1 nanosecond per number, it would take 10<sup>14</sup> years to enumerate them all.
+            </div>
+
+            <h3>Storage and Computation Costs</h3>
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li><strong>Storage:</strong> Each entry is a decimal number. 100 variables = 10<sup>30</sup> entries = impossibly large.</li>
+                <li><strong>Computation:</strong> Answering even one query requires summing many of these entries.</li>
+                <li><strong>Representation:</strong> You can't even write down the probabilities explicitly.</li>
+                <li><strong>Learning:</strong> You'd need 2<sup>100</sup> data points just to estimate reasonable probabilities—an infinite impossibility.</li>
+            </ul>
+
+            <h3>Why This Matters</h3>
+            <p style="margin-top: 1rem;">This exponential explosion is why we need smarter approaches:</p>
+
+            <ul style="margin-left: 2rem; margin-top: 0.8rem;">
+                <li><strong>Bayesian Networks:</strong> Exploit independence to represent distributions compactly.</li>
+                <li><strong>Markov Networks:</strong> Use local factors instead of global probabilities.</li>
+                <li><strong>Sampling Methods:</strong> Estimate probabilities without computing everything.</li>
+                <li><strong>Variational Inference:</strong> Approximate distributions tractably.</li>
+                <li><strong>Deep Learning:</strong> Use neural networks to implicitly represent distributions.</li>
+            </ul>
+
+            <div class="key-insight" style="background: rgba(165, 215, 210, 0.15); color: white; border-left-color: #a5d7d2;">
+                <strong>The fundamental lesson:</strong> The full joint distribution is the foundation of probabilistic reasoning, but it doesn't scale. The entire field of graphical models, approximate inference, and modern machine learning exists because of this limitation. Understanding this problem is key to understanding why we need Bayesian networks, sampling, and other techniques.
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="card summary-section">
+            <h2>Summary</h2>
+
+            <h3 style="color: #a5d7d2;">What You've Learned</h3>
+            <ul style="margin-left: 2rem; margin-top: 1rem; color: #2d373c;">
+                <li><strong>Full Joint Distribution:</strong> A table with 2<sup>n</sup> entries for n Boolean variables, listing the probability of every possible combination. Must sum to 1.</li>
+                <li><strong>Answering Queries:</strong> Add up the rows that match your question. For any event, P(event) = sum of matching rows.</li>
+                <li><strong>Marginalization:</strong> Ignore unobserved variables by summing them out: P(Y) = Σ<sub>z</sub> P(Y,Z).</li>
+                <li><strong>Conditioning:</strong> Compute P(X|e) by dividing: P(X|e) = P(X∧e) / P(e). The numerator is joint probability; the denominator is the probability of the evidence.</li>
+                <li><strong>Normalization:</strong> You can compute unnormalized values and normalize at the end using α. This saves computation by deferring division.</li>
+                <li><strong>General Equation:</strong> P(X|e) = α Σ<sub>y</sub> P(X, e, y). This is the universal formula for inference.</li>
+                <li><strong>Scalability Problem:</strong> Exponential growth (2<sup>n</sup> entries) makes this approach impractical for real problems. This motivates all advanced inference techniques.</li>
+            </ul>
+
+            <h3 style="color: #a5d7d2; margin-top: 1.5rem;">The Big Picture</h3>
+            <p style="color: #2d373c; margin-top: 1rem;">The full joint distribution is the "brute force" solution to probabilistic inference. It's theoretically perfect: it encodes all relationships, answers any query, and the math is straightforward. But it's practically impossible for realistic problems. This is why the rest of Chapter 12 and beyond introduces clever ways to represent, compute, and approximate probabilities without explicitly enumerating every combination.</p>
+        </div>
+
+        <!-- Key Terms Section -->
+        <div class="card dark-card">
+            <h2>Key Terminology</h2>
+
+            <div class="term-list">
+                <div class="term">
+                    <strong>Full Joint Probability Distribution</strong>
+                    <p>A table listing P(X₁, X₂, ..., Xₙ) for all possible combinations of variable values. Complete but exponentially large.</p>
+                </div>
+                <div class="term">
+                    <strong>Marginalization</strong>
+                    <p>Summing over unobserved variables to get the probability of observed variables: P(Y) = Σ<sub>z</sub> P(Y, Z).</p>
+                </div>
+                <div class="term">
+                    <strong>Conditioning</strong>
+                    <p>Computing conditional probability given evidence: P(X|e) = P(X ∧ e) / P(e). Isolates probability in worlds where evidence is true.</p>
+                </div>
+                <div class="term">
+                    <strong>Normalization (α)</strong>
+                    <p>Scaling factor that makes probabilities sum to 1. Allows us to compute unnormalized values and rescale at the end.</p>
+                </div>
+                <div class="term">
+                    <strong>Joint Probability</strong>
+                    <p>Probability of multiple events occurring together: P(A ∧ B). Read from the full table by summing matching rows.</p>
+                </div>
+                <div class="term">
+                    <strong>Evidence (e)</strong>
+                    <p>The observed variables or facts. Used to condition the probability: P(query | evidence).</p>
+                </div>
+                <div class="term">
+                    <strong>Query (X)</strong>
+                    <p>The variable(s) we want to find the probability of. What we're trying to infer.</p>
+                </div>
+                <div class="term">
+                    <strong>Exponential Growth</strong>
+                    <p>The main problem: n Boolean variables require 2ⁿ rows. 100 variables ≈ 10³⁰ entries—computationally infeasible.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; color: #666; font-size: 0.9rem;">
+            <p>Chapter 12.3: Inference Using Full Joint Distributions</p>
+            <p style="margin-top: 0.5rem;">From Russell & Norvig's "Artificial Intelligence: A Modern Approach"</p>
+            <p style="margin-top: 1rem; font-style: italic;">Study materials created for AI foundations course</p>
+        </div>
+
+        <div class="bottom-nav">
+          <a href="lesson_2_probability_basics.html" class="nav-btn prev">&larr; Probability Basics</a>
+          <a href="lesson_4_independence.html" class="nav-btn next">Next: Independence &rarr;</a>
+        </div>
+    </div>
+</body>
+</html>

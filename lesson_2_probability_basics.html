@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12.2 — The Language of Probability</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  h2 { font-family: Georgia, serif; font-size: 1.4rem; margin: 2rem 0 1rem 0; padding-top: 1rem; border-top: 2px solid #e0e0e0; }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+
+  .notation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  @media (max-width: 600px) { .notation-grid { grid-template-columns: 1fr; } }
+  .notation-item { background: white; border-radius: 10px; padding: 1.2rem; border-left: 4px solid #a5d7d2; }
+  .notation-item .math { font-family: 'Consolas', monospace; font-size: 1.2rem; font-weight: bold; color: #2d373c; margin-bottom: 0.3rem; }
+  .notation-item .meaning { font-size: 0.95rem; color: #555; }
+  .notation-item .example { font-size: 0.9rem; color: #888; margin-top: 0.4rem; font-style: italic; }
+
+  .analogy { background: #e8f5f2; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; border-left: 5px solid #a5d7d2; }
+  .analogy h3 { color: #1a6b5c; margin-bottom: 0.5rem; }
+
+  .formula-box .label { color: #999; font-size: 0.85rem; font-family: 'Segoe UI', sans-serif; margin-bottom: 0.3rem; }
+  .formula-box .note { color: #ccc; font-size: 0.85rem; font-family: 'Segoe UI', sans-serif; margin-top: 0.5rem; }
+
+  .warning { background: #fce4e8; border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0; border-left: 4px solid #d20537; }
+  .warning strong { color: #d20537; }
+
+  .axiom-list { counter-reset: axiom; }
+  .axiom { background: white; border-radius: 10px; padding: 1.2rem; margin-bottom: 0.8rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .axiom-num { background: #d20537; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+  .axiom .math { font-family: 'Consolas', monospace; font-weight: bold; color: #2d373c; }
+  .axiom .plain { color: #555; font-size: 0.95rem; margin-top: 0.3rem; }
+
+  .example-calc { background: white; border-radius: 12px; padding: 1.5rem; margin: 1rem 0; }
+  .example-calc h3 { color: #d20537; margin-bottom: 0.8rem; }
+  .step { display: flex; gap: 0.8rem; margin-bottom: 0.6rem; align-items: flex-start; }
+  .step-arrow { color: #a5d7d2; font-weight: bold; font-size: 1.2rem; flex-shrink: 0; }
+  .step-content { font-size: 0.95rem; }
+  .step-content code { background: #f0f0f0; padding: 0.15rem 0.4rem; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9rem; }
+
+  .summary { background: linear-gradient(135deg, #2d373c, #3d4d54); color: white; border-radius: 12px; padding: 1.5rem; margin-top: 2rem; }
+  .summary h2 { color: #a5d7d2; border: none; margin-top: 0; padding-top: 0; }
+  .summary ul { padding-left: 1.5rem; }
+  .summary li { margin-bottom: 0.5rem; }
+  .summary li strong { color: #a5d7d2; }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">Ch. 12 Study Guide</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="lesson_1_why_uncertainty.html">1</a>
+    <a href="lesson_2_probability_basics.html" class="active">2</a>
+    <a href="lesson_3_full_joint.html">3</a>
+    <a href="lesson_4_independence.html">4</a>
+    <a href="lesson_5_bayes_rule.html">5</a>
+    <a href="lesson_6_naive_bayes.html">6</a>
+    <a href="lesson_7_wumpus_world.html">7</a>
+    <a href="discussion_guide_ch12.html">💬</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<h1>Chapter 12.2 — The Language of Probability</h1>
+<p class="subtitle">Learning the notation so we can talk about uncertainty precisely</p>
+
+<!-- PART 1: RANDOM VARIABLES -->
+<h2>Part 1: What Are Random Variables?</h2>
+
+<div class="analogy">
+  <h3>Think of it like a form at the dentist's office</h3>
+  <p>When you go to the dentist, they might track several things about you. Each of these is a <strong>random variable</strong> — something whose value we might not know yet.</p>
+</div>
+
+<div class="notation-grid">
+  <div class="notation-item">
+    <div class="math">Cavity</div>
+    <div class="meaning">Does the patient have a cavity?</div>
+    <div class="example">Values: true or false (Boolean)</div>
+  </div>
+  <div class="notation-item">
+    <div class="math">Toothache</div>
+    <div class="meaning">Does the patient have a toothache?</div>
+    <div class="example">Values: true or false (Boolean)</div>
+  </div>
+  <div class="notation-item">
+    <div class="math">Catch</div>
+    <div class="meaning">Does the dentist's probe catch?</div>
+    <div class="example">Values: true or false (Boolean)</div>
+  </div>
+  <div class="notation-item">
+    <div class="math">Weather</div>
+    <div class="meaning">What's the weather today?</div>
+    <div class="example">Values: sunny, rain, cloud, snow (multi-valued)</div>
+  </div>
+</div>
+
+<div class="card">
+  <p><strong>Convention:</strong> We use <strong>uppercase</strong> for the variable name (<em>Cavity</em>) and <strong>lowercase</strong> for a specific value (<em>cavity</em> = true, <em>¬cavity</em> = false). This seems fussy but it matters when reading formulas.</p>
+</div>
+
+<!-- PART 2: TYPES OF PROBABILITY -->
+<h2>Part 2: Three Types of Probability Statements</h2>
+
+<div class="notation-grid">
+  <div class="notation-item" style="border-left-color: #d20537;">
+    <div class="math">P(cavity) = 0.2</div>
+    <div class="meaning"><strong>Prior / Unconditional probability</strong></div>
+    <div class="example">Before we know ANYTHING else: 20% of patients have a cavity. This is what you'd guess walking in blind.</div>
+  </div>
+  <div class="notation-item" style="border-left-color: #d20537;">
+    <div class="math">P(cavity | toothache) = 0.6</div>
+    <div class="meaning"><strong>Conditional / Posterior probability</strong></div>
+    <div class="example">GIVEN that we know the patient has a toothache: now there's a 60% chance of cavity. New evidence updated our belief.</div>
+  </div>
+</div>
+
+<div class="analogy">
+  <h3>Analogy: Weather forecasting</h3>
+  <p><strong>Prior:</strong> "There's a 30% chance of rain tomorrow" (before checking anything).<br>
+  <strong>Posterior:</strong> "Given that the barometer is dropping, there's a 70% chance of rain" (after seeing evidence).</p>
+  <p style="margin-top: 0.5rem;">Evidence <em>updates</em> our beliefs. That's the whole point of conditional probability.</p>
+</div>
+
+<div class="dark-card">
+  <h3>The bold P notation — distributions</h3>
+  <p style="margin-bottom: 0.8rem;">Sometimes we want ALL the probabilities at once. The textbook uses bold <strong>P</strong> for this:</p>
+  <div class="formula-box" style="background: rgba(255,255,255,0.1);">
+    <div class="label">A distribution gives you all values at once:</div>
+    <strong>P</strong>(Cavity) = &#10216;0.2, 0.8&#10217;
+    <div class="note">This means P(cavity) = 0.2 and P(¬cavity) = 0.8 — two numbers that add up to 1.</div>
+  </div>
+</div>
+
+<!-- PART 3: THE RULES -->
+<h2>Part 3: The Rules of Probability (Axioms)</h2>
+
+<p style="margin-bottom: 1rem;">There are really just three basic rules. Everything else follows from these:</p>
+
+<div class="axiom-list">
+  <div class="axiom">
+    <div class="axiom-num">1</div>
+    <div>
+      <div class="math">0 ≤ P(a) ≤ 1</div>
+      <div class="plain">Every probability is between 0 (impossible) and 1 (certain). Nothing more, nothing less.</div>
+    </div>
+  </div>
+  <div class="axiom">
+    <div class="axiom-num">2</div>
+    <div>
+      <div class="math">P(true) = 1 &nbsp;&nbsp;and&nbsp;&nbsp; P(false) = 0</div>
+      <div class="plain">Things that are definitely true have probability 1. Things that are definitely false have probability 0.</div>
+    </div>
+  </div>
+  <div class="axiom">
+    <div class="axiom-num">3</div>
+    <div>
+      <div class="math">P(a ∨ b) = P(a) + P(b) − P(a ∧ b)</div>
+      <div class="plain">"The probability of A or B" = P(A) + P(B) minus the overlap (where both are true). If they can't both be true, just add them.</div>
+    </div>
+  </div>
+</div>
+
+<div class="example-calc">
+  <h3>Quick example: Axiom 3 in action</h3>
+  <div class="step">
+    <div class="step-arrow">→</div>
+    <div class="step-content">What's the probability a patient has a cavity OR a toothache (or both)?</div>
+  </div>
+  <div class="step">
+    <div class="step-arrow">→</div>
+    <div class="step-content"><code>P(cavity) = 0.2</code>, <code>P(toothache) = 0.2</code>, and <code>P(cavity ∧ toothache) = 0.12</code></div>
+  </div>
+  <div class="step">
+    <div class="step-arrow">→</div>
+    <div class="step-content"><code>P(cavity ∨ toothache) = 0.2 + 0.2 − 0.12 = 0.28</code></div>
+  </div>
+  <div class="step">
+    <div class="step-arrow">→</div>
+    <div class="step-content">We subtract 0.12 because those patients have BOTH — we don't want to count them twice.</div>
+  </div>
+</div>
+
+<div class="warning">
+  <strong>Important consequence:</strong> P(¬a) = 1 − P(a). If there's a 20% chance of cavity, there's an 80% chance of no cavity. They must add up to 1.
+</div>
+
+<!-- PART 4: THE PRODUCT RULE & BAYES -->
+<h2>Part 4: The Product Rule and Bayes' Rule</h2>
+
+<p style="margin-bottom: 1rem;">These two rules are the most important formulas in the entire chapter.</p>
+
+<div class="formula-box">
+  <div class="label">The Product Rule — how to compute joint probabilities:</div>
+  P(a ∧ b) = P(a | b) · P(b)
+  <div class="note">"The chance of both A and B" = "the chance of A given B" × "the chance of B"</div>
+</div>
+
+<div class="analogy">
+  <h3>Analogy: Two doors</h3>
+  <p>To get to room B, you have to first open door A (probability 0.3) and then door B only opens if A is open (probability 0.5 given A is open).</p>
+  <p style="margin-top: 0.3rem;">Chance of reaching room B = 0.3 × 0.5 = 0.15.</p>
+</div>
+
+<div class="formula-box" style="background: #d20537;">
+  <div class="label" style="color: rgba(255,255,255,0.7);">Bayes' Rule — THE formula of this chapter:</div>
+  <span style="color: white;">P(b | a) = P(a | b) · P(b) / P(a)</span>
+  <div class="note" style="color: rgba(255,255,255,0.7);">"Flip" a conditional probability. If you know P(a|b), you can compute P(b|a).</div>
+</div>
+
+<div class="example-calc">
+  <h3>Bayes' Rule: The Meningitis Example</h3>
+  <p style="margin-bottom: 0.8rem;">A doctor knows these facts:</p>
+  <div class="step"><div class="step-arrow">→</div><div class="step-content"><code>P(stiff neck | meningitis) = 0.7</code> — meningitis causes a stiff neck 70% of the time</div></div>
+  <div class="step"><div class="step-arrow">→</div><div class="step-content"><code>P(meningitis) = 1/50,000</code> — meningitis is very rare</div></div>
+  <div class="step"><div class="step-arrow">→</div><div class="step-content"><code>P(stiff neck) = 0.01</code> — 1% of all patients have a stiff neck</div></div>
+  <p style="margin: 0.8rem 0; font-weight: bold;">Question: A patient has a stiff neck. How likely is meningitis?</p>
+  <div class="step"><div class="step-arrow">→</div><div class="step-content"><code>P(meningitis | stiff neck) = 0.7 × (1/50000) / 0.01 = 0.0014</code></div></div>
+  <div class="step"><div class="step-arrow">→</div><div class="step-content"><strong>Only 0.14%!</strong> Even though meningitis USUALLY causes a stiff neck, stiff necks are mostly caused by other things. The disease is just too rare.</div></div>
+</div>
+
+<div class="dark-card">
+  <h3>Why Bayes' Rule matters for AI</h3>
+  <p style="margin-bottom: 0.8rem;">In the real world, doctors/dentists/agents usually know things in the <strong>causal direction</strong>:</p>
+  <div class="formula-box" style="background: rgba(255,255,255,0.1);">
+    P(symptom | disease) — "this disease causes this symptom X% of the time"
+  </div>
+  <p>But what they NEED is the <strong>diagnostic direction</strong>:</p>
+  <div class="formula-box" style="background: rgba(255,255,255,0.1);">
+    P(disease | symptom) — "given these symptoms, what disease does the patient have?"
+  </div>
+  <p style="margin-top: 0.5rem;">Bayes' Rule lets you flip from cause→effect to effect→cause. That's why it's the foundation of medical AI, spam filters, and almost all probabilistic reasoning.</p>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary">
+  <h2>Section 12.2 — What You Need to Remember</h2>
+  <ul>
+    <li><strong>Random variables</strong> represent things we don't know yet (Cavity, Toothache, etc.)</li>
+    <li><strong>Prior P(a)</strong> = belief before seeing evidence. <strong>Posterior P(a|b)</strong> = belief after evidence.</li>
+    <li><strong>Three axioms</strong> — probabilities are between 0 and 1, and the "or" rule handles overlaps.</li>
+    <li><strong>Product rule:</strong> P(a ∧ b) = P(a|b) · P(b) — how to compute "both happen"</li>
+    <li><strong>Bayes' rule:</strong> P(b|a) = P(a|b)·P(b)/P(a) — flip from cause→effect to effect→cause</li>
+    <li><strong>Causal vs. diagnostic:</strong> We usually know cause→effect. Bayes lets us go effect→cause.</li>
+  </ul>
+</div>
+
+<div class="bottom-nav">
+  <a href="lesson_1_why_uncertainty.html" class="nav-btn prev">&larr; Why Uncertainty?</a>
+  <a href="lesson_3_full_joint.html" class="nav-btn next">Next: Full Joint Distributions &rarr;</a>
+</div>
+
+</div>
+
+</body>
+</html>
