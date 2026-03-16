@@ -695,6 +695,32 @@ details li {
   font-size: 1rem;
 }
 
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-slides {
+  display: inline-block;
+  background: transparent;
+  color: #fff;
+  padding: 1rem 2.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: 2px solid #a5d7d2;
+  transition: all 0.2s;
+}
+
+.btn-slides:hover {
+  background: rgba(165,215,210,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(165,215,210,0.3);
+}
+
 .btn-start {
   display: inline-block;
   background: #d20537;
